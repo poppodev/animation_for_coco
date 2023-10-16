@@ -1,0 +1,31 @@
+{
+  "name": "animation_for_coco",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000t\u0000e\u0000s\u0000t\u0000\r\u0000 \u0000t\u0000h\u0000i\u0000s\u0000 \u0000i\u0000s\u0000 \u0000t\u0000e\u0000s\u0000t\u0000 \u0000r\u0000e\u0000a\u0000d\u0000 \u0000m\u0000e\u0000.\u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack serve --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://poppodev@github.com/poppodev/animation_for_coco.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/poppodev/animation_for_coco/issues"
+  },
+  "homepage": "https://github.com/poppodev/animation_for_coco#readme",
+  "dependencies": {
+    "html-webpack-plugin": "^5.5.3",
+    "pixi.js": "^7.3.1",
+    "ts-loader": "^9.5.0",
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}

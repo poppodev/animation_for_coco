@@ -1,9 +1,6 @@
 # ノードの依存関係ディレクトリ
 node_modules/
 
-# Webpackの出力ディレクトリ
-dist/
-
 # TypeScriptのビルド出力
 *.js
 *.js.map
@@ -22,3 +19,6 @@ yarn-error.log*
 .idea/
 *.sublime*
 *.DS_Store
+
+# 自分自身の設定ファイル
+.gitignore

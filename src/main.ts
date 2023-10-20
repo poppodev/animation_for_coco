@@ -1,85 +1,129 @@
-import * as PIXI from 'pixi.js';
-import { Assets } from 'pixi.js';
-import { AnimatedSprite, Texture } from 'pixi.js';
+import * as PIXI from 'pixi.js'
+import { Coco } from './coco'
+import { Komatsu } from './komatsu'
+import { Toriko } from './toriko'
+import { isContinueStatement } from 'typescript'
 
 const app = new PIXI.Application({
-    width: 1000,
-    height: 600,
-    backgroundColor: 0xEEEEEE
-});
+  width: 1200,
+  height: 700,
+  backgroundColor: 0xEEEEEE
+})
 
-Assets.backgroundLoadBundle('load-screen');
+window.addEventListener('load', () => {
+  console.log('loadbefore')
+  PIXI.Assets.load(
+    [{ alias: 'background', src: './images/background_grass.jpeg' },
+      { alias: 'cocoWalk1', src: './images/coco_walk_0000_walk1.png' },
+      { alias: 'cocoWalk2', src: './images/coco_walk_0001_walk2.png' },
+      { alias: 'cocoWalk3', src: './images/coco_walk_0002_walk3.png' },
+      { alias: 'cocoWalk4', src: './images/coco_walk_0003_walk4.png' },
+      { alias: 'cocoWalk5', src: './images/coco_walk_0004_walk5.png' },
+      { alias: 'cocoWalk6', src: './images/coco_walk_0005_walk6.png' },
+      { alias: 'cocoWalk7', src: './images/coco_walk_0006_walk7.png' },
+      { alias: 'cocoWalk8', src: './images/coco_walk_0007_walk8.png' },
+      { alias: 'cocoStand', src: './images/coco_walk_0008_base.png' },
+      { alias: 'cocoRun1', src: './images/coco_run_0000_run1.png' },
+      { alias: 'cocoRun2', src: './images/coco_run_0001_run2.png' },
+      { alias: 'cocoRun3', src: './images/coco_run_0002_run3.png' },
+      { alias: 'cocoRun4', src: './images/coco_run_0003_run4.png' },
+      { alias: 'cocoRun5', src: './images/coco_run_0004_run5.png' },
+      { alias: 'cocoRun6', src: './images/coco_run_0005_run6.png' },
+      { alias: 'cocoRun7', src: './images/coco_run_0006_run7.png' },
+      { alias: 'cocoRun8', src: './images/coco_run_0007_run8.png' },
+      { alias: 'komatsuWalk1', src: './images/komatsu_walk_0001_walk1.png' },
+	  { alias: 'komatsuWalk2', src: './images/komatsu_walk_0002_walk2.png' },
+      { alias: 'komatsuWalk3', src: './images/komatsu_walk_0003_walk3.png' },
+      { alias: 'komatsuWalk4', src: './images/komatsu_walk_0004_walk4.png' },
+      { alias: 'komatsuWalk5', src: './images/komatsu_walk_0005_walk5.png' },
+      { alias: 'komatsuWalk6', src: './images/komatsu_walk_0006_walk6.png' },
+      { alias: 'komatsuWalk7', src: './images/komatsu_walk_0007_walk7.png' },
+      { alias: 'komatsuWalk8', src: './images/komatsu_walk_0008_walk8.png' },
+      { alias: 'komatsuStand', src: './images/komatsu_base.png' },
+      { alias: 'torikoStand', src: './images/toriko_base.png' },
+      { alias: 'cocoDown1', src: './images/coco_down_0001_1.png' },
+      { alias: 'cocoDown2', src: './images/coco_down_0002_2.png' },
+      { alias: 'cocoDown3', src: './images/coco_down_0003_3.png' },
+      { alias: 'cocoDown4', src: './images/coco_down_0004_4.png' },
+      { alias: 'cocoDown5', src: './images/coco_down_0005_5.png' },
+      { alias: 'cocoTurnLeft1', src: './images/coco_turn_left_0001_1.png' },
+      { alias: 'cocoTurnLeft2', src: './images/coco_turn_left_0002_2.png' },
+      { alias: 'cocoTurnLeft3', src: './images/coco_turn_left_0003_3.png' },
+      { alias: 'cocoTurnLeft4', src: './images/coco_turn_left_0004_4.png' },
+      { alias: 'cocoTurnLeft5', src: './images/coco_turn_left_0005_5.png' },
+      { alias: 'cocoTurnLeft6', src: './images/coco_turn_left_0006_6.png' },
+      { alias:  'cocoTurnLeft7', src: './images/coco_turn_left_0007_7.png' },
+    ]
+  )
+    .then(setUp)
+})
 
-window.document.addEventListener('DOMContentLoaded', () => {
+async function setUp () {
+  console.log('startSetup')
+  const appView = app.view as HTMLCanvasElement | null
+  if (appView) {
+    document.body.appendChild(appView)
+    document.getElementById('loading')!.style.display = 'none'
 
-    document.body.appendChild(app.view as HTMLCanvasElement);
+    // background
+    const background = new PIXI.Sprite(PIXI.Texture.from('background'))
+    background.anchor.set(0.5, 1)
+    background.x = app.renderer.width / 2
+    background.y = app.renderer.height + 100
+    background.scale.set(0.3)
+    app.stage.addChild(background)
 
-    // coco
-    const cocoWalkImages = [
-        './images/coco_walk_0000_walk1.png',
-        './images/coco_walk_0001_walk2.png',
-        './images/coco_walk_0002_walk3.png',
-        './images/coco_walk_0003_walk4.png',
-        './images/coco_walk_0004_walk5.png',
-        './images/coco_walk_0005_walk6.png',
-        './images/coco_walk_0006_walk7.png',
-        './images/coco_walk_0007_walk8.png'
-    ];
-    const cocoWalkTextureArray: Texture[] = [];
+    // characters
+    const coco = new Coco(app)
+    const komatsu = new Komatsu(app)
+    const toriko = new Toriko(app)
 
-    cocoWalkImages.forEach((imagePath) => {
-        const texture = Texture.from(imagePath);
-        cocoWalkTextureArray.push(texture);
-    });
+    // triggers
+    document.getElementById('coco')!.addEventListener('click', function () {
+      if (!app.stage.children.includes(coco)) {
+        app.stage.addChild(coco)
+      }
+    })
+    document.getElementById('walkCoco')!.addEventListener('click', function () {
+      if (app.stage.children.includes(coco) && !coco.isWalking) {
+        coco.walk()
+      }
+    })
 
-    const cocoWalk = new AnimatedSprite(cocoWalkTextureArray);
-    cocoWalk.anchor.set(1);
-    cocoWalk.scale.set(0.5);
-    cocoWalk.x = app.renderer.width / 2;
-    cocoWalk.y = app.renderer.height * 0.95;
-    cocoWalk.animationSpeed = 0.1;
-    cocoWalk.play();
-    app.stage.addChild(cocoWalk);
-        app.ticker.add(() => {
-        cocoWalk.x += -3;
-        if (cocoWalk.x < 0) {
-            cocoWalk.x = app.renderer.width;
+    document.getElementById('stopCoco')!.addEventListener('click', function () {
+      if (app.stage.children.includes(coco)) {
+        coco.stop()
+      }
+    })
+
+    document.getElementById('runCoco')!.addEventListener('click', function () {
+      if (app.stage.children.includes(coco)) {
+        coco.run()
+      }
+    })
+    document.getElementById('downCoco')!.addEventListener('click', function () {
+      if (app.stage.children.includes(coco)) {
+        coco.down()
+      }
+    })
+    document.getElementById('turnCoco')!.addEventListener('click', function () {
+        if (app.stage.children.includes(coco)) {
+          coco.turn(true)
         }
-    });
+    })
 
-
-    // komatsu
-    const komatsuWalkImages = [
-        './images/komatsu_walk_0001_walk1.png',
-        './images/komatsu_walk_0002_walk2.png',
-        './images/komatsu_walk_0003_walk3.png',
-        './images/komatsu_walk_0004_walk4.png',
-        './images/komatsu_walk_0005_walk5.png',
-        './images/komatsu_walk_0006_walk6.png',
-        './images/komatsu_walk_0007_walk7.png',
-        './images/komatsu_walk_0008_walk8.png'
-    ];
-    const komatsuWalkTextureArray: Texture[] = [];
-
-    komatsuWalkImages.forEach((imagePath) => {
-        const texture = Texture.from(imagePath);
-        komatsuWalkTextureArray.push(texture);
-    });
-
-    const komatsuWalk = new AnimatedSprite(komatsuWalkTextureArray);
-    //左右反転
-    komatsuWalk.scale.x *= -1;
-    komatsuWalk.anchor.set(1);
-    komatsuWalk.scale.set(0.5);
-    komatsuWalk.x = app.renderer.width / 2;
-    komatsuWalk.y = app.renderer.height * 0.97;
-    komatsuWalk.animationSpeed = 0.1;
-    komatsuWalk.play();
-    app.stage.addChild(komatsuWalk);
-        app.ticker.add(() => {
-        komatsuWalk.x += 2;
-        if (komatsuWalk.x > app.renderer.width+ komatsuWalk.width) {
-            komatsuWalk.x = 0;
-        }
-    });
-});
+    document.getElementById('komatsu')!.addEventListener('click', function () {
+      if (!app.stage.children.includes(komatsu)) {
+        app.stage.addChild(komatsu)
+        setTimeout(() => {
+          komatsu.walk()
+        }, 1000)
+      }
+    })
+    document.getElementById('toriko')!.addEventListener('click', function () {
+      if (!app.stage.children.includes(toriko)) {
+        app.stage.addChild(toriko)
+      }
+    })
+  }
+}

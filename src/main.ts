@@ -2,7 +2,6 @@ import * as PIXI from 'pixi.js'
 import { Coco } from './coco'
 import { Komatsu } from './komatsu'
 import { Toriko } from './toriko'
-import { isContinueStatement } from 'typescript'
 
 const app = new PIXI.Application({
   width: 1200,
@@ -52,7 +51,7 @@ window.addEventListener('load', () => {
       { alias: 'cocoTurnLeft4', src: './images/coco_turn_left_0004_4.png' },
       { alias: 'cocoTurnLeft5', src: './images/coco_turn_left_0005_5.png' },
       { alias: 'cocoTurnLeft6', src: './images/coco_turn_left_0006_6.png' },
-      { alias:  'cocoTurnLeft7', src: './images/coco_turn_left_0007_7.png' },
+      { alias: 'cocoTurnLeft7', src: './images/coco_turn_left_0007_7.png' }
     ]
   )
     .then(setUp)
@@ -62,7 +61,7 @@ async function setUp () {
   console.log('startSetup')
   const appView = app.view as HTMLCanvasElement | null
   if (appView) {
-    document.body.appendChild(appView)
+    document.getElementById('mainCanvas')!.appendChild(appView)
     document.getElementById('loading')!.style.display = 'none'
 
     // background
@@ -70,7 +69,6 @@ async function setUp () {
     background.anchor.set(0.5, 1)
     background.x = app.renderer.width / 2
     background.y = app.renderer.height + 100
-    background.scale.set(0.3)
     app.stage.addChild(background)
 
     // characters
@@ -107,19 +105,31 @@ async function setUp () {
       }
     })
     document.getElementById('turnCoco')!.addEventListener('click', function () {
-        if (app.stage.children.includes(coco)) {
-          coco.turn(true)
-        }
+      if (app.stage.children.includes(coco)) {
+        coco.turn(true)
+      }
     })
 
+    // trigers for komatsu
     document.getElementById('komatsu')!.addEventListener('click', function () {
       if (!app.stage.children.includes(komatsu)) {
         app.stage.addChild(komatsu)
-        setTimeout(() => {
-          komatsu.walk()
-        }, 1000)
       }
     })
+
+    document.getElementById('walkKomatsu')!.addEventListener('click', function () {
+      if (app.stage.children.includes(komatsu)) {
+        komatsu.walk()
+      }
+    })
+
+    document.getElementById('stopKomatsu')!.addEventListener('click', function () {
+      if (app.stage.children.includes(komatsu)) {
+        komatsu.stop()
+      }
+    })
+
+    // trigers for toriko
     document.getElementById('toriko')!.addEventListener('click', function () {
       if (!app.stage.children.includes(toriko)) {
         app.stage.addChild(toriko)

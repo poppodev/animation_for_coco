@@ -37,7 +37,7 @@ export class Coco extends PIXI.Container {
       if (this.isWalking) {
         this.x += -3
       } else if (this.isRunning) {
-        this.x += -6
+        this.x += -8
       }
       if (this.x < 0 - this.width) {
         this.x = this.app.renderer.width
@@ -89,7 +89,7 @@ export class Coco extends PIXI.Container {
     })
     this.runSprite = new AnimatedSprite(runTextures)
     this.runSprite.visible = false
-    this.runSprite.animationSpeed = 0.15
+    this.runSprite.animationSpeed = 0.18
     this.runSprite.play()
     this.runSprite.name = 'cocoRun'
     this.addChild(this.runSprite)

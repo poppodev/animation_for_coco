@@ -4,7 +4,7 @@ import { AnimatedSprite, Texture } from 'pixi.js'
 export class Komatsu extends PIXI.Container {
   app: PIXI.Application
   isWalking: boolean = false
-  private readonly walkSprite!: AnimatedSprite
+  private walkSprite!: AnimatedSprite
   private readonly baseSprite!: PIXI.Sprite
 
   constructor (app: PIXI.Application) {
@@ -21,6 +21,21 @@ export class Komatsu extends PIXI.Container {
     this.x = 0
     this.y = this.app.renderer.height - this.height + 5
 
+    // sprites
+    this.setWalkSprite()
+
+    // animation loop
+    this.app.ticker.add(() => {
+      if (this.isWalking) {
+        this.x += 2
+      }
+      if (this.x > this.app.renderer.width + this.width) {
+        this.x = -this.width
+      }
+    })
+  }
+
+  private setWalkSprite () {
     const walkSrcs = [
       'komatsuWalk1',
       'komatsuWalk2',
@@ -47,23 +62,12 @@ export class Komatsu extends PIXI.Container {
   }
 
   walk () {
-    console.log('walk')
     this.isWalking = true
     this.walkSprite.visible = true
-    this.app.ticker.add(() => {
-      if (!this.isWalking) {
-        return
-      }
-      this.x += 2
-      if (this.x > this.app.renderer.width + this.width) {
-        this.x = -this.width
-      }
-    })
     this.baseSprite.visible = false
   }
 
   stop () {
-    console.log('stop')
     this.walkSprite.visible = false
     this.baseSprite.visible = true
     this.isWalking = false

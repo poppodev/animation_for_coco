@@ -5,7 +5,7 @@ import { Toriko } from './toriko'
 
 const app = new PIXI.Application({
   width: 1200,
-  height: 700,
+  height: 600,
   backgroundColor: 0xEEEEEE
 })
 
@@ -13,6 +13,7 @@ window.addEventListener('load', () => {
   console.log('loadbefore')
   PIXI.Assets.load(
     [{ alias: 'background', src: './images/background_grass.jpeg' },
+      { alias: 'cocoStand', src: './images/coco_walk_0008_base.png' },
       { alias: 'cocoWalk1', src: './images/coco_walk_0000_walk1.png' },
       { alias: 'cocoWalk2', src: './images/coco_walk_0001_walk2.png' },
       { alias: 'cocoWalk3', src: './images/coco_walk_0002_walk3.png' },
@@ -21,7 +22,6 @@ window.addEventListener('load', () => {
       { alias: 'cocoWalk6', src: './images/coco_walk_0005_walk6.png' },
       { alias: 'cocoWalk7', src: './images/coco_walk_0006_walk7.png' },
       { alias: 'cocoWalk8', src: './images/coco_walk_0007_walk8.png' },
-      { alias: 'cocoStand', src: './images/coco_walk_0008_base.png' },
       { alias: 'cocoRun1', src: './images/coco_run_0000_run1.png' },
       { alias: 'cocoRun2', src: './images/coco_run_0001_run2.png' },
       { alias: 'cocoRun3', src: './images/coco_run_0002_run3.png' },
@@ -68,35 +68,40 @@ async function setUp () {
     const background = new PIXI.Sprite(PIXI.Texture.from('background'))
     background.anchor.set(0.5, 1)
     background.x = app.renderer.width / 2
-    background.y = app.renderer.height + 100
+    background.y = app.renderer.height + 110
     app.stage.addChild(background)
 
     // characters
-    const coco = new Coco(app)
-    const komatsu = new Komatsu(app)
-    const toriko = new Toriko(app)
+    const coco = new Coco(app, 0.4)
+    const komatsu = new Komatsu(app, 0.4)
+    const toriko = new Toriko(app, 0.4)
 
     // triggers
     document.getElementById('coco')!.addEventListener('click', function () {
       if (!app.stage.children.includes(coco)) {
         app.stage.addChild(coco)
+      } else {
+        coco.stop()
+        coco.visible = !coco.visible
       }
     })
     document.getElementById('walkCoco')!.addEventListener('click', function () {
-      if (app.stage.children.includes(coco) && !coco.isWalking) {
-        coco.walk()
-      }
-    })
-
-    document.getElementById('stopCoco')!.addEventListener('click', function () {
       if (app.stage.children.includes(coco)) {
-        coco.stop()
+        if (!coco.isWalking) {
+          coco.walk()
+        } else {
+          coco.stop()
+        }
       }
     })
 
     document.getElementById('runCoco')!.addEventListener('click', function () {
       if (app.stage.children.includes(coco)) {
-        coco.run()
+        if (coco.isRunning) {
+          coco.stop()
+        } else {
+          coco.run()
+        }
       }
     })
     document.getElementById('downCoco')!.addEventListener('click', function () {
@@ -104,28 +109,24 @@ async function setUp () {
         coco.down()
       }
     })
-    document.getElementById('turnCoco')!.addEventListener('click', function () {
-      if (app.stage.children.includes(coco)) {
-        coco.turn(true)
-      }
-    })
 
     // trigers for komatsu
     document.getElementById('komatsu')!.addEventListener('click', function () {
       if (!app.stage.children.includes(komatsu)) {
         app.stage.addChild(komatsu)
+      } else {
+        komatsu.stop()
+        komatsu.visible = !komatsu.visible
       }
     })
 
     document.getElementById('walkKomatsu')!.addEventListener('click', function () {
       if (app.stage.children.includes(komatsu)) {
-        komatsu.walk()
-      }
-    })
-
-    document.getElementById('stopKomatsu')!.addEventListener('click', function () {
-      if (app.stage.children.includes(komatsu)) {
-        komatsu.stop()
+        if (komatsu.isWalking) {
+          komatsu.stop()
+        } else {
+          komatsu.walk()
+        }
       }
     })
 
@@ -133,6 +134,8 @@ async function setUp () {
     document.getElementById('toriko')!.addEventListener('click', function () {
       if (!app.stage.children.includes(toriko)) {
         app.stage.addChild(toriko)
+      } else {
+        toriko.visible = !toriko.visible
       }
     })
   }

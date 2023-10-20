@@ -7,10 +7,10 @@ export class Toriko extends PIXI.Container {
   private readonly walkSprite!: AnimatedSprite
   private readonly baseSprite!: PIXI.Sprite
 
-  constructor (app: PIXI.Application) {
+  constructor (app: PIXI.Application, scale: number = 0.5) {
     super()
     this.app = app
-    this.scale.set(0.5)
+    this.scale.set(scale)
 
     const standTexture = PIXI.Texture.from('torikoStand')
     const baseSprite = new PIXI.Sprite(standTexture)
@@ -19,6 +19,6 @@ export class Toriko extends PIXI.Container {
     this.baseSprite = baseSprite
 
     this.x = this.app.renderer.width - this.width
-    this.y = this.app.renderer.height - this.height - 5
+    this.y = this.app.renderer.height - this.height * 1.1 - 5
   }
 }

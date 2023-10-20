@@ -5,16 +5,18 @@ export class Coco extends PIXI.Container {
   app: PIXI.Application
   isWalking: boolean = false
   isRunning: boolean = false
+  orirentation: 'left' | 'right' = 'left'
   private readonly baseSprite!: PIXI.Sprite
   private walkSprite!: AnimatedSprite
   private runSprite!: AnimatedSprite
   private downSprite!: AnimatedSprite
   private turnLeftSprite!: AnimatedSprite
+  private readonly turnMargin = 50
 
-  constructor (app: PIXI.Application) {
+  constructor (app: PIXI.Application, scale: number = 0.5) {
     super()
     this.app = app
-    this.scale.set(0.5)
+    this.scale.set(scale)
 
     // basesprite
     const standTexture = PIXI.Texture.from('cocoStand')
@@ -23,8 +25,9 @@ export class Coco extends PIXI.Container {
     this.addChild(baseSprite)
     this.baseSprite = baseSprite
 
-    this.x = this.app.renderer.width - this.width
-    this.y = this.app.renderer.height - this.height
+    // initial position
+    this.x = this.app.renderer.width / 2
+    this.y = this.app.renderer.height - this.height * 1.1
 
     // animated sprites
     this.setWalkSprite()
@@ -34,13 +37,24 @@ export class Coco extends PIXI.Container {
 
     // animation loop
     this.app.ticker.add(() => {
-      if (this.isWalking) {
-        this.x += -3
-      } else if (this.isRunning) {
-        this.x += -8
+      if (this.isWalking || this.isRunning) {
+        if (this.orirentation === 'left') {
+          if (this.x + this.width * scale < 0 + this.turnMargin * scale) {
+            console.log('reach left end')
+            this.turn()
+          }
+        } else {
+          if (this.x + this.width * scale > this.app.renderer.width - this.turnMargin * scale) {
+            console.log('reach right end')
+            this.turn()
+          }
+        }
       }
-      if (this.x < 0 - this.width) {
-        this.x = this.app.renderer.width
+      const direction = this.orirentation === 'left' ? 1 : -1
+      if (this.isWalking) {
+        this.x += -6 * scale * direction
+      } else if (this.isRunning) {
+        this.x += -15 * scale * direction
       }
     })
   }
@@ -185,8 +199,9 @@ export class Coco extends PIXI.Container {
     this.downSprite.gotoAndPlay(0)
   }
 
-  turn (fromLeft: boolean): void {
-    console.log('turn')
+  turn () {
+    const originallyRunning = this.isRunning
+    const originallyWalking = this.isWalking
     this.isWalking = false
     this.isRunning = false
     this.baseSprite.visible = false
@@ -195,5 +210,19 @@ export class Coco extends PIXI.Container {
     this.downSprite.visible = false
     this.turnLeftSprite.visible = true
     this.turnLeftSprite.gotoAndPlay(0)
+    this.turnLeftSprite.onComplete = () => {
+      this.orirentation = this.orirentation === 'right' ? 'left' : 'right'
+      if (originallyRunning) {
+        this.scale.x *= -1
+        this.x -= this.width
+        this.run()
+      }
+      if (originallyWalking) {
+        this.scale.x *= -1
+        this.x -= this.width
+        this.walk()
+      }
+      console.log(this.orirentation)
+    }
   }
 }

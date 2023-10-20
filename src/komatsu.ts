@@ -4,13 +4,14 @@ import { AnimatedSprite, Texture } from 'pixi.js'
 export class Komatsu extends PIXI.Container {
   app: PIXI.Application
   isWalking: boolean = false
+  orirentation: 'left' | 'right' = 'right'
   private walkSprite!: AnimatedSprite
   private readonly baseSprite!: PIXI.Sprite
 
-  constructor (app: PIXI.Application) {
+  constructor (app: PIXI.Application, scale: number = 0.5) {
     super()
     this.app = app
-    this.scale.set(0.5)
+    this.scale.set(scale)
 
     const standTexture = PIXI.Texture.from('komatsuStand')
     const baseSprite = new PIXI.Sprite(standTexture)
@@ -19,7 +20,7 @@ export class Komatsu extends PIXI.Container {
     this.baseSprite = baseSprite
 
     this.x = 0
-    this.y = this.app.renderer.height - this.height + 5
+    this.y = this.app.renderer.height - this.height * 1.1 + 5
 
     // sprites
     this.setWalkSprite()
@@ -27,10 +28,21 @@ export class Komatsu extends PIXI.Container {
     // animation loop
     this.app.ticker.add(() => {
       if (this.isWalking) {
-        this.x += 2
+        if (this.orirentation === 'left') {
+          if (this.x + this.width < 0) {
+            console.log('reach left end')
+            this.turn()
+          }
+        } else {
+          if (this.x + this.width > this.app.renderer.width) {
+            console.log('reach right end')
+            this.turn()
+          }
+        }
       }
-      if (this.x > this.app.renderer.width + this.width) {
-        this.x = -this.width
+      const direction = this.orirentation === 'right' ? 1 : -1
+      if (this.isWalking) {
+        this.x += 4 * scale * direction
       }
     })
   }
@@ -71,5 +83,16 @@ export class Komatsu extends PIXI.Container {
     this.walkSprite.visible = false
     this.baseSprite.visible = true
     this.isWalking = false
+  }
+
+  turn () {
+    const originallyWalking = this.isWalking
+    this.orirentation = this.orirentation === 'right' ? 'left' : 'right'
+    if (originallyWalking) {
+      this.scale.x *= -1
+      this.x -= this.width
+      this.walk()
+    }
+    console.log(this.orirentation)
   }
 }

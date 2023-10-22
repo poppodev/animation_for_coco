@@ -30,16 +30,6 @@ window.addEventListener('load', () => {
       { alias: 'cocoRun6', src: './images/coco_run_0005_run6.png' },
       { alias: 'cocoRun7', src: './images/coco_run_0006_run7.png' },
       { alias: 'cocoRun8', src: './images/coco_run_0007_run8.png' },
-      { alias: 'komatsuWalk1', src: './images/komatsu_walk_0001_walk1.png' },
-	  { alias: 'komatsuWalk2', src: './images/komatsu_walk_0002_walk2.png' },
-      { alias: 'komatsuWalk3', src: './images/komatsu_walk_0003_walk3.png' },
-      { alias: 'komatsuWalk4', src: './images/komatsu_walk_0004_walk4.png' },
-      { alias: 'komatsuWalk5', src: './images/komatsu_walk_0005_walk5.png' },
-      { alias: 'komatsuWalk6', src: './images/komatsu_walk_0006_walk6.png' },
-      { alias: 'komatsuWalk7', src: './images/komatsu_walk_0007_walk7.png' },
-      { alias: 'komatsuWalk8', src: './images/komatsu_walk_0008_walk8.png' },
-      { alias: 'komatsuStand', src: './images/komatsu_base.png' },
-      { alias: 'torikoStand', src: './images/toriko_base.png' },
       { alias: 'cocoDown1', src: './images/coco_down_0001_1.png' },
       { alias: 'cocoDown2', src: './images/coco_down_0002_2.png' },
       { alias: 'cocoDown3', src: './images/coco_down_0003_3.png' },
@@ -51,7 +41,47 @@ window.addEventListener('load', () => {
       { alias: 'cocoTurnLeft4', src: './images/coco_turn_left_0004_4.png' },
       { alias: 'cocoTurnLeft5', src: './images/coco_turn_left_0005_5.png' },
       { alias: 'cocoTurnLeft6', src: './images/coco_turn_left_0006_6.png' },
-      { alias: 'cocoTurnLeft7', src: './images/coco_turn_left_0007_7.png' }
+      { alias: 'cocoTurnLeft7', src: './images/coco_turn_left_0007_7.png' },
+      { alias: 'cocoWalkReversePatch', src: './images/coco_walk_reverse_patch.png' },
+      { alias: 'cocoTurnReverse1', src: './images/coco_turn_reverse_1.png' },
+      { alias: 'cocoTurnReverse2', src: './images/coco_turn_reverse_2.png' },
+      { alias: 'cocoTurnReverse3', src: './images/coco_turn_reverse_3.png' },
+      { alias: 'cocoTurnReverse4', src: './images/coco_turn_reverse_4.png' },
+      { alias: 'cocoTurnReverse5', src: './images/coco_turn_reverse_5.png' },
+      { alias: 'cocoTurnReverse6', src: './images/coco_turn_reverse_6.png' },
+      { alias: 'cocoTurnReverse7', src: './images/coco_turn_reverse_7.png' },
+      { alias: 'cocoRunReverse1', src: './images/coco_run_reverse_1.png' },
+      { alias: 'cocoRunReverse2', src: './images/coco_run_reverse_2.png' },
+      { alias: 'cocoRunReverse3', src: './images/coco_run_reverse_3.png' },
+      { alias: 'cocoRunReverse4', src: './images/coco_run_reverse_4.png' },
+      { alias: 'cocoRunReverse5', src: './images/coco_run_reverse_5.png' },
+      { alias: 'cocoRunReverse6', src: './images/coco_run_reverse_6.png' },
+      { alias: 'cocoRunReverse7', src: './images/coco_run_reverse_7.png' },
+      { alias: 'cocoRunReverse8', src: './images/coco_run_reverse_8.png' },
+      { alias: 'cocoDownReverse1', src: './images/coco_down_reverse_1.png' },
+      { alias: 'cocoDownReverse2', src: './images/coco_down_reverse_2.png' },
+      { alias: 'cocoDownReverse3', src: './images/coco_down_reverse_3.png' },
+      { alias: 'cocoDownReverse4', src: './images/coco_down_reverse_4.png' },
+      { alias: 'cocoDownReverse5', src: './images/coco_down_reverse_5.png' },
+      { alias: 'cocoEyeClose', src: './images/coco_parts_eye_close.png' },
+      { alias: 'cocoEyeOpen', src: './images/coco_parts_eye_open.png' },
+      { alias: 'cocoEyeHalf', src: './images/coco_parts_eye_half.png' },
+      { alias: 'cocoEyeSmile', src: './images/coco_parts_eye_smile.png' },
+      { alias: 'cocoMouseOpen', src: './images/coco_parts_mouse_open.png' },
+      { alias: 'cocoMouseSmile', src: './images/coco_parts_mouse_smile.png' },
+      { alias: 'cocoDownSmile1', src: './images/coco_down_smile_1.png' },
+      { alias: 'cocoDownSmile2', src: './images/coco_down_smile_2.png' },
+      { alias: 'cocoDownSmile3', src: './images/coco_down_smile_3.png' },
+      { alias: 'komatsuWalk1', src: './images/komatsu_walk_0001_walk1.png' },
+	  { alias: 'komatsuWalk2', src: './images/komatsu_walk_0002_walk2.png' },
+      { alias: 'komatsuWalk3', src: './images/komatsu_walk_0003_walk3.png' },
+      { alias: 'komatsuWalk4', src: './images/komatsu_walk_0004_walk4.png' },
+      { alias: 'komatsuWalk5', src: './images/komatsu_walk_0005_walk5.png' },
+      { alias: 'komatsuWalk6', src: './images/komatsu_walk_0006_walk6.png' },
+      { alias: 'komatsuWalk7', src: './images/komatsu_walk_0007_walk7.png' },
+      { alias: 'komatsuWalk8', src: './images/komatsu_walk_0008_walk8.png' },
+      { alias: 'komatsuStand', src: './images/komatsu_base.png' },
+      { alias: 'torikoStand', src: './images/toriko_base.png' }
     ]
   )
     .then(setUp)
@@ -107,6 +137,16 @@ async function setUp () {
     document.getElementById('downCoco')!.addEventListener('click', function () {
       if (app.stage.children.includes(coco)) {
         coco.down()
+      }
+    })
+    document.getElementById('turnCoco')!.addEventListener('click', function () {
+      if (app.stage.children.includes(coco)) {
+        coco.turn()
+      }
+    })
+    document.getElementById('smileCoco')!.addEventListener('click', function () {
+      if (app.stage.children.includes(coco)) {
+        coco.smile()
       }
     })
 

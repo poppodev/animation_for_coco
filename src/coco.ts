@@ -29,6 +29,14 @@ export class Coco extends PIXI.Container {
     const standTexture = PIXI.Texture.from('cocoStand')
     const baseSprite = new PIXI.Sprite(standTexture)
     baseSprite.name = 'cocoBase'
+    // shadow
+    const shadowGraphics = new PIXI.Graphics()
+    shadowGraphics.beginFill(0x000000, 0.15)
+    shadowGraphics.drawEllipse(0, 0, 100, 20)
+    shadowGraphics.endFill()
+    shadowGraphics.x = baseSprite.width / 2
+    shadowGraphics.y = baseSprite.height - 30
+    baseSprite.addChildAt(shadowGraphics, 0)
     this.addChild(baseSprite)
     this.baseSprite = baseSprite
 
@@ -101,6 +109,16 @@ export class Coco extends PIXI.Container {
     this.walkSprite.animationSpeed = 0.1
     this.walkSprite.play()
     this.walkSprite.name = 'cocoWalk'
+
+    // shadow
+    const shadowGraphics = new PIXI.Graphics()
+    shadowGraphics.beginFill(0x000000, 0.15)
+    shadowGraphics.drawEllipse(0, 0, 170, 20)
+    shadowGraphics.endFill()
+    shadowGraphics.x = this.baseSprite.width / 2 + 20
+    shadowGraphics.y = this.baseSprite.height - 30
+    this.walkSprite.addChildAt(shadowGraphics, 0)
+
     this.addChild(this.walkSprite)
   }
 
@@ -125,6 +143,13 @@ export class Coco extends PIXI.Container {
     this.runSprite.animationSpeed = 0.18
     this.runSprite.play()
     this.runSprite.name = 'cocoRun'
+    const shadowGraphics = new PIXI.Graphics()
+    shadowGraphics.beginFill(0x000000, 0.15)
+    shadowGraphics.drawEllipse(0, 0, 220, 20)
+    shadowGraphics.endFill()
+    shadowGraphics.x = this.baseSprite.width / 2 + 20
+    shadowGraphics.y = this.baseSprite.height - 30
+    this.runSprite.addChildAt(shadowGraphics, 0)
     this.addChild(this.runSprite)
   }
 
@@ -147,6 +172,15 @@ export class Coco extends PIXI.Container {
     this.downSprite.name = 'cocoDown'
     this.downSprite.loop = false
     this.downSprite.visible = false
+
+    const shadowGraphics = new PIXI.Graphics()
+    shadowGraphics.beginFill(0x000000, 0.15)
+    shadowGraphics.drawEllipse(0, 0, 200, 20)
+    shadowGraphics.endFill()
+    shadowGraphics.x = this.baseSprite.width / 2
+    shadowGraphics.y = this.baseSprite.height - 30
+    this.downSprite.addChildAt(shadowGraphics, 0)
+
     this.addChild(this.downSprite)
   }
 
@@ -170,6 +204,15 @@ export class Coco extends PIXI.Container {
     this.turnLeftSprite.name = 'cocoTurnLeft'
     this.turnLeftSprite.loop = false
     this.turnLeftSprite.visible = false
+
+    const shadowGraphics = new PIXI.Graphics()
+    shadowGraphics.beginFill(0x000000, 0.15)
+    shadowGraphics.drawEllipse(0, 0, 200, 20)
+    shadowGraphics.endFill()
+    shadowGraphics.x = this.baseSprite.width / 2
+    shadowGraphics.y = this.baseSprite.height - 30
+    this.turnLeftSprite.addChildAt(shadowGraphics, 0)
+
     this.addChild(this.turnLeftSprite)
   }
 

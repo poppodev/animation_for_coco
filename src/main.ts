@@ -2,17 +2,21 @@ import * as PIXI from 'pixi.js'
 import { Coco } from './coco'
 import { Komatsu } from './komatsu'
 import { Toriko } from './toriko'
+import { Sunny } from './sunny'
+import { Queen } from './queen'
 
 const app = new PIXI.Application({
   width: 1200,
   height: 600,
-  backgroundColor: 0xEEEEEE
+  backgroundColor: 0xFFFFFF,
+  antialias: true
 })
 
 window.addEventListener('load', () => {
   console.log('loadbefore')
   PIXI.Assets.load(
-    [{ alias: 'background', src: './images/background_grass.jpeg' },
+    [{ alias: 'background', src: './images/background_grass.png' },
+      { alias: 'clouds', src: './images/background_clouds.png' },
       { alias: 'cocoStand', src: './images/coco_walk_0008_base.png' },
       { alias: 'cocoWalk1', src: './images/coco_walk_0000_walk1.png' },
       { alias: 'cocoWalk2', src: './images/coco_walk_0001_walk2.png' },
@@ -81,7 +85,21 @@ window.addEventListener('load', () => {
       { alias: 'komatsuWalk7', src: './images/komatsu_walk_0007_walk7.png' },
       { alias: 'komatsuWalk8', src: './images/komatsu_walk_0008_walk8.png' },
       { alias: 'komatsuStand', src: './images/komatsu_base.png' },
-      { alias: 'torikoStand', src: './images/toriko_base.png' }
+      { alias: 'torikoStand', src: './images/toriko_base.png' },
+      { alias: 'flowers', src: './images/flowers.png' },
+      { alias: 'sunny', src: './images/sunny.png', mipmap: true },
+      { alias: 'sunnyArm', src: './images/sunny_arm.png' },
+      { alias: 'sunnyArmFree', src: './images/sunny_arm_free.png' },
+      { alias: 'sunnySmile', src: './images/sunny_eye_smile.png' },
+      { alias: 'queen', src: './images/queen.png' },
+      { alias: 'sunnyHair1', src: './images/sunny_hair8.png' },
+      { alias: 'sunnyHair2', src: './images/sunny_hair7.png' },
+      { alias: 'sunnyHair3', src: './images/sunny_hair6.png' },
+      { alias: 'sunnyHair4', src: './images/sunny_hair5.png' },
+      { alias: 'sunnyHair5', src: './images/sunny_hair4.png' },
+      { alias: 'sunnyHair6', src: './images/sunny_hair3.png' },
+      { alias: 'sunnyHair7', src: './images/sunny_hair2.png' },
+      { alias: 'sunnyHair8', src: './images/sunny_hair1.png' }
     ]
   )
     .then(setUp)
@@ -97,14 +115,37 @@ async function setUp () {
     // background
     const background = new PIXI.Sprite(PIXI.Texture.from('background'))
     background.anchor.set(0.5, 1)
+    background.alpha = 0.9
     background.x = app.renderer.width / 2
-    background.y = app.renderer.height + 110
+    background.y = app.renderer.height + 150
     app.stage.addChild(background)
+
+    // clouds
+    const clouds = new PIXI.Sprite(PIXI.Texture.from('clouds'))
+    const clouds2 = new PIXI.Sprite(PIXI.Texture.from('clouds'))
+    clouds.y = app.renderer.height / 10
+    clouds2.y = app.renderer.height / 10
+    clouds2.x = clouds.width
+    app.stage.addChild(clouds)
+    app.stage.addChild(clouds2)
+    app.ticker.add(() => {
+      clouds.x -= 0.1
+      clouds2.x -= 0.1
+      if (clouds.x < -clouds.width) {
+        clouds.x = app.renderer.width
+      }
+      if (clouds2.x < -clouds2.width) {
+        clouds2.x = app.renderer.width
+      }
+    })
 
     // characters
     const coco = new Coco(app, 0.4)
     const komatsu = new Komatsu(app, 0.4)
     const toriko = new Toriko(app, 0.4)
+    const queen = new Queen(app, 0.4)
+    const sunny = new Sunny(app, 0.4)
+    queen.addChild(sunny)
 
     // triggers
     document.getElementById('coco')!.addEventListener('click', function () {
@@ -178,5 +219,28 @@ async function setUp () {
         toriko.visible = !toriko.visible
       }
     })
+
+    // trigers for sunny
+    document.getElementById('sunny')!.addEventListener('click', function () {
+      if (!app.stage.children.includes(queen)) {
+        app.stage.addChild(queen)
+      } else {
+        queen.visible = !queen.visible
+      }
+      if (queen.visible) {
+        queen.appear()
+      }
+    })
+    document.getElementById('smileSunny')!.addEventListener('click', function () {
+      if (app.stage.children.includes(queen)) {
+        sunny.smile()
+      }
+    })
+    document.getElementById('presentSunny')!.addEventListener('click', function () {
+      if (app.stage.children.includes(queen)) {
+        sunny.givePresent()
+      }
+    }
+    )
   }
 }

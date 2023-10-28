@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js'
-import { AnimatedSprite, Texture } from 'pixi.js'
 
 export class Queen extends PIXI.Container {
   app: PIXI.Application
@@ -8,7 +7,6 @@ export class Queen extends PIXI.Container {
   constructor (app: PIXI.Application, scale: number = 0.5) {
     super()
     this.app = app
-    // this.scale.set(scale)
 
     const baseTextire = PIXI.Texture.from('queen')
     const baseSprite = new PIXI.Sprite(baseTextire)
@@ -21,6 +19,8 @@ export class Queen extends PIXI.Container {
   }
 
   appear () {
+    console.log('appear')
+    this.visible = true
     const stopPointX = this.app.renderer.width / 4
     const stopPointY = -260 * this.baseSprite.scale.y
 
@@ -34,11 +34,44 @@ export class Queen extends PIXI.Container {
     const duration = 120
     const xStep = (stopPointX - startPointX) / duration
     const yStep = (stopPointY - startPointY) / duration
-    this.app.ticker.add(() => {
+    const appearTicker = new PIXI.Ticker()
+    appearTicker.add(() => {
       if (this.x < stopPointX) {
         this.x += xStep
         this.y += yStep
+      } else {
+        appearTicker.destroy()
       }
     })
+    appearTicker.start()
+  }
+
+  getOut () {
+    console.log('getOut')
+    const stopPointX = this.app.renderer.width / 6
+    const stopPointY = -this.height
+
+    const startPointX = this.x
+    const startPointY = this.y
+
+    // start position
+    this.x = startPointX
+    this.y = startPointY
+
+    const duration = 120
+    const xStep = (stopPointX - startPointX) / duration
+    const yStep = (stopPointY - startPointY) / duration
+    console.log(`xStep: ${xStep}, yStep: ${yStep}`)
+    const appearTicker = new PIXI.Ticker()
+    appearTicker.add(() => {
+      if (this.x > stopPointX) {
+        this.x += xStep
+        this.y += yStep
+      } else {
+        this.visible = false
+        appearTicker.destroy()
+      }
+    })
+    appearTicker.start()
   }
 }

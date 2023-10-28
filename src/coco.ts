@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import { AnimatedSprite, Texture } from 'pixi.js'
+import { AnimatedSprite } from 'pixi.js'
 
 export class Coco extends PIXI.Container {
   app: PIXI.Application
@@ -29,6 +29,7 @@ export class Coco extends PIXI.Container {
     const standTexture = PIXI.Texture.from('cocoStand')
     const baseSprite = new PIXI.Sprite(standTexture)
     baseSprite.name = 'cocoBase'
+
     // shadow
     const shadowGraphics = new PIXI.Graphics()
     shadowGraphics.beginFill(0x000000, 0.15)
@@ -97,12 +98,7 @@ export class Coco extends PIXI.Container {
       'cocoWalk7',
       'cocoWalk8'
     ]
-    const walkTextures: Texture[] = []
-
-    walkSrcs.forEach((imagePath) => {
-      const texture = Texture.from(imagePath)
-      walkTextures.push(texture)
-    })
+    const walkTextures = walkSrcs.map(src => PIXI.Texture.from(src))
 
     this.walkSprite = new AnimatedSprite(walkTextures)
     this.walkSprite.visible = false
@@ -133,11 +129,7 @@ export class Coco extends PIXI.Container {
       'cocoRun7',
       'cocoRun8'
     ]
-    const runTextures: Texture[] = []
-    runSrcs.forEach((imagePath) => {
-      const texture = Texture.from(imagePath)
-      runTextures.push(texture)
-    })
+    const runTextures = runSrcs.map(src => PIXI.Texture.from(src))
     this.runSprite = new AnimatedSprite(runTextures)
     this.runSprite.visible = false
     this.runSprite.animationSpeed = 0.18
@@ -162,11 +154,7 @@ export class Coco extends PIXI.Container {
       'cocoDown4',
       'cocoDown5'
     ]
-    const downTextures: Texture[] = []
-    srcDowns.forEach((imagePath) => {
-      const texture = Texture.from(imagePath)
-      downTextures.push(texture)
-    })
+    const downTextures = srcDowns.map(src => PIXI.Texture.from(src))
     this.downSprite = new AnimatedSprite(downTextures)
     this.downSprite.animationSpeed = 0.15
     this.downSprite.name = 'cocoDown'
@@ -194,11 +182,7 @@ export class Coco extends PIXI.Container {
       'cocoTurnLeft6',
       'cocoTurnLeft7'
     ]
-    const turnLeftTextures: Texture[] = []
-    srcTurnLefts.forEach((imagePath) => {
-      const texture = Texture.from(imagePath)
-      turnLeftTextures.push(texture)
-    })
+    const turnLeftTextures = srcTurnLefts.map(src => PIXI.Texture.from(src))
     this.turnLeftSprite = new AnimatedSprite(turnLeftTextures)
     this.turnLeftSprite.animationSpeed = 0.2
     this.turnLeftSprite.name = 'cocoTurnLeft'
@@ -235,11 +219,7 @@ export class Coco extends PIXI.Container {
       'cocoTurnReverse6',
       'cocoTurnReverse7'
     ]
-    const turnReverseTextures: Texture[] = []
-    srcTurnReverse.forEach((imagePath) => {
-      const texture = Texture.from(imagePath)
-      turnReverseTextures.push(texture)
-    })
+    const turnReverseTextures = srcTurnReverse.map(src => PIXI.Texture.from(src))
     const turnReverseSprite = new AnimatedSprite(turnReverseTextures)
     turnReverseSprite.animationSpeed = 0.2
     turnReverseSprite.name = 'turnReverse'
@@ -259,11 +239,7 @@ export class Coco extends PIXI.Container {
       'cocoRunReverse7',
       'cocoRunReverse8'
     ]
-    const runReverseTextures: Texture[] = []
-    srcRunReverse.forEach((imagePath) => {
-      const texture = Texture.from(imagePath)
-      runReverseTextures.push(texture)
-    })
+    const runReverseTextures = srcRunReverse.map(src => PIXI.Texture.from(src))
     const runReverseSprite = new AnimatedSprite(runReverseTextures)
     runReverseSprite.animationSpeed = 0.18
     runReverseSprite.name = 'runReverse'
@@ -279,11 +255,7 @@ export class Coco extends PIXI.Container {
       'cocoDownReverse4',
       'cocoDownReverse5'
     ]
-    const downReverseTextures: Texture[] = []
-    srcDownReverse.forEach((imagePath) => {
-      const texture = Texture.from(imagePath)
-      downReverseTextures.push(texture)
-    })
+    const downReverseTextures = srcDownReverse.map(src => PIXI.Texture.from(src))
     const downReverseSprite = new AnimatedSprite(downReverseTextures)
     downReverseSprite.animationSpeed = 0.15
     downReverseSprite.name = 'downReverse'
@@ -294,11 +266,7 @@ export class Coco extends PIXI.Container {
 
     // eye close animation
     const srcEyeClose = ['cocoEyeOpen', 'cocoEyeHalf', 'cocoEyeClose']
-    const eyeCloseTextures: Texture[] = []
-    srcEyeClose.forEach((imagePath) => {
-      const texture = Texture.from(imagePath)
-      eyeCloseTextures.push(texture)
-    })
+    const eyeCloseTextures = srcEyeClose.map(src => PIXI.Texture.from(src))
     const eyeCloseSprite = new AnimatedSprite(eyeCloseTextures)
     eyeCloseSprite.animationSpeed = 0.1
     eyeCloseSprite.name = 'eyeClose'
@@ -309,11 +277,7 @@ export class Coco extends PIXI.Container {
 
     // eye blink animation
     const srcEyeBlink = ['cocoEyeOpen', 'cocoEyeHalf', 'cocoEyeClose', 'cocoEyeHalf', 'cocoEyeOpen']
-    const eyeBlinkTextures: Texture[] = []
-    srcEyeBlink.forEach((imagePath) => {
-      const texture = Texture.from(imagePath)
-      eyeBlinkTextures.push(texture)
-    })
+    const eyeBlinkTextures = srcEyeBlink.map(src => PIXI.Texture.from(src))
     const eyeBlinkSprite = new AnimatedSprite(eyeBlinkTextures)
     eyeBlinkSprite.animationSpeed = 0.3
     eyeBlinkSprite.name = 'eyeBlink'
@@ -324,11 +288,7 @@ export class Coco extends PIXI.Container {
 
     // down smile animation
     const srcDownSmile = ['cocoDownSmile1', 'cocoDownSmile2', 'cocoDownSmile3']
-    const downSmileTextures: Texture[] = []
-    srcDownSmile.forEach((imagePath) => {
-      const texture = Texture.from(imagePath)
-      downSmileTextures.push(texture)
-    })
+    const downSmileTextures = srcDownSmile.map(src => PIXI.Texture.from(src))
     const downSmileSprite = new AnimatedSprite(downSmileTextures)
     downSmileSprite.animationSpeed = 0.3
     downSmileSprite.name = 'downSmile'

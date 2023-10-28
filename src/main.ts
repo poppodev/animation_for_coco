@@ -4,6 +4,7 @@ import { Komatsu } from './komatsu'
 import { Toriko } from './toriko'
 import { Sunny } from './sunny'
 import { Queen } from './queen'
+import { Zebra } from './zebra'
 
 const app = new PIXI.Application({
   width: 1200,
@@ -85,7 +86,21 @@ window.addEventListener('load', () => {
       { alias: 'komatsuWalk7', src: './images/komatsu_walk_0007_walk7.png' },
       { alias: 'komatsuWalk8', src: './images/komatsu_walk_0008_walk8.png' },
       { alias: 'komatsuStand', src: './images/komatsu_base.png' },
+      { alias: 'komatsuSmile', src: './images/komatsu_smile.png' },
       { alias: 'torikoStand', src: './images/toriko_base.png' },
+      { alias: 'torikoSmile', src: './images/toriko_smile.png' },
+      { alias: 'torikoArmRight1', src: './images/toriko_arm_right.png' },
+      { alias: 'torikoArmRight2', src: './images/toriko_arm_right2.png' },
+      { alias: 'torikoArmRight3', src: './images/toriko_arm_right3.png' },
+      { alias: 'torikoArmRight4', src: './images/toriko_arm_right4.png' },
+      { alias: 'torikoWalk1', src: './images/toriko_walk1.png' },
+      { alias: 'torikoWalk2', src: './images/toriko_walk2.png' },
+      { alias: 'torikoWalk3', src: './images/toriko_walk3.png' },
+      { alias: 'torikoWalk4', src: './images/toriko_walk4.png' },
+      { alias: 'torikoWalk5', src: './images/toriko_walk5.png' },
+      { alias: 'torikoWalk6', src: './images/toriko_walk6.png' },
+      { alias: 'torikoWalk7', src: './images/toriko_walk7.png' },
+      { alias: 'torikoWalk8', src: './images/toriko_walk8.png' },
       { alias: 'flowers', src: './images/flowers.png' },
       { alias: 'sunny', src: './images/sunny.png', mipmap: true },
       { alias: 'sunnyArm', src: './images/sunny_arm.png' },
@@ -99,7 +114,11 @@ window.addEventListener('load', () => {
       { alias: 'sunnyHair5', src: './images/sunny_hair4.png' },
       { alias: 'sunnyHair6', src: './images/sunny_hair3.png' },
       { alias: 'sunnyHair7', src: './images/sunny_hair2.png' },
-      { alias: 'sunnyHair8', src: './images/sunny_hair1.png' }
+      { alias: 'sunnyHair8', src: './images/sunny_hair1.png' },
+      { alias: 'cake', src: './images/cake.png' },
+      { alias: 'cakeCover', src: './images/cake_cover.png' },
+      { alias: 'zebra', src: './images/zebra_base.png' },
+      { alias: 'zebraSmile', src: './images/zebra_smile.png' }
     ]
   )
     .then(setUp)
@@ -146,6 +165,7 @@ async function setUp () {
     const queen = new Queen(app, 0.4)
     const sunny = new Sunny(app, 0.4)
     queen.addChild(sunny)
+    const zebra = new Zebra(app, 0.4)
 
     // triggers
     document.getElementById('coco')!.addEventListener('click', function () {
@@ -210,13 +230,38 @@ async function setUp () {
         }
       }
     })
+    document.getElementById('smileKomatsu')!.addEventListener('click', function () {
+      if (app.stage.children.includes(komatsu)) {
+        komatsu.smile()
+      }
+    })
 
     // trigers for toriko
     document.getElementById('toriko')!.addEventListener('click', function () {
       if (!app.stage.children.includes(toriko)) {
         app.stage.addChild(toriko)
       } else {
+        toriko.stop()
         toriko.visible = !toriko.visible
+      }
+    })
+    document.getElementById('smileToriko')!.addEventListener('click', function () {
+      if (app.stage.children.includes(toriko)) {
+        toriko.smile()
+      }
+    })
+    document.getElementById('presentToriko')!.addEventListener('click', function () {
+      if (app.stage.children.includes(toriko)) {
+        toriko.givePresent()
+      }
+    })
+    document.getElementById('walkToriko')!.addEventListener('click', function () {
+      if (app.stage.children.includes(toriko)) {
+        if (toriko.isWalking) {
+          toriko.stop()
+        } else {
+          toriko.walk()
+        }
       }
     })
 
@@ -224,11 +269,13 @@ async function setUp () {
     document.getElementById('sunny')!.addEventListener('click', function () {
       if (!app.stage.children.includes(queen)) {
         app.stage.addChild(queen)
-      } else {
-        queen.visible = !queen.visible
-      }
-      if (queen.visible) {
         queen.appear()
+      } else {
+        if (queen.visible) {
+          queen.getOut()
+        } else {
+          queen.appear()
+        }
       }
     })
     document.getElementById('smileSunny')!.addEventListener('click', function () {
@@ -240,7 +287,15 @@ async function setUp () {
       if (app.stage.children.includes(queen)) {
         sunny.givePresent()
       }
-    }
-    )
+    })
+
+    // trigers for zebra
+    document.getElementById('zebra')!.addEventListener('click', function () {
+      if (!app.stage.children.includes(zebra)) {
+        app.stage.addChild(zebra)
+      } else {
+        zebra.visible = !zebra.visible
+      }
+    })
   }
 }

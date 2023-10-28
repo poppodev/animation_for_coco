@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js'
-import { AnimatedSprite, Texture } from 'pixi.js'
 
 export class Sunny extends PIXI.Container {
   app: PIXI.Application
@@ -18,7 +17,6 @@ export class Sunny extends PIXI.Container {
     this.baseSprite = new PIXI.Sprite(baseTextire)
     this.baseSprite.name = 'sunnyBase'
     this.addChild(this.baseSprite)
-    this.baseSprite = this.baseSprite
 
     this.x = 600 * scale
     this.y = 650 * scale
@@ -27,6 +25,7 @@ export class Sunny extends PIXI.Container {
     const armTexture = PIXI.Texture.from('sunnyArm')
     this.armSprite = new PIXI.Sprite(armTexture)
     this.armSprite.name = 'sunnyArm'
+
     // 320,300
     this.armSprite.anchor.set(320 / 600, 300 / 700)
     this.armSprite.x = 800 * this.scale.x
@@ -64,14 +63,13 @@ export class Sunny extends PIXI.Container {
   }
 
   givePresent () {
-    // armSpriteを上を軸として90℃回転させるアニメーション
     const duration = 20
     const stopAngle = 60
     const step = stopAngle / duration * ((Math.round(this.armSprite.rotation) >= 0) ? -1 : 1)
     let currentAngle = 0
 
     this.app.ticker.add(() => {
-      if (step < 0 && currentAngle >= -stopAngle || step > 0 && currentAngle <= stopAngle) {
+      if ((step < 0 && currentAngle >= -stopAngle) || (step > 0 && currentAngle <= stopAngle)) {
         this.armSprite.rotation += step * Math.PI / 180
         currentAngle += step
       }

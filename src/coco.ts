@@ -25,6 +25,7 @@ export class Coco extends PIXI.Container {
   private readonly turnMargin = 50
 
   constructor (app: PIXI.Application, scale: number = 0.5) {
+    console.log("initialized coco")
     super()
     this.app = app
     this.scale.set(scale)

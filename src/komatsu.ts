@@ -33,7 +33,7 @@ export class Komatsu extends PIXI.Container {
     this.addChild(this.baseSprite)
 
     this.x = 0
-    this.y = this.app.renderer.height - this.height * 1.1 + 5
+    this.y = this.app.renderer.height - 350
 
     // sprites
     this.setWalkSprite()

@@ -48,7 +48,7 @@ export class Queen extends PIXI.Container {
 
   getOut () {
     console.log('getOut')
-    const stopPointX = this.app.renderer.width / 6
+    const stopPointX = this.app.renderer.width * 2 / 3
     const stopPointY = -this.height
 
     const startPointX = this.x
@@ -58,13 +58,12 @@ export class Queen extends PIXI.Container {
     this.x = startPointX
     this.y = startPointY
 
-    const duration = 120
+    const duration = 150
     const xStep = (stopPointX - startPointX) / duration
     const yStep = (stopPointY - startPointY) / duration
-    console.log(`xStep: ${xStep}, yStep: ${yStep}`)
     const appearTicker = new PIXI.Ticker()
     appearTicker.add(() => {
-      if (this.x > stopPointX) {
+      if (this.x < stopPointX) {
         this.x += xStep
         this.y += yStep
       } else {

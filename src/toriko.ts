@@ -4,9 +4,12 @@ import { type AnimatedSprite } from 'pixi.js'
 export class Toriko extends PIXI.Container {
   app: PIXI.Application
   isWalking: boolean = false
+  hasPresent: boolean = true
   private walkSprite!: AnimatedSprite
+  private walkArmSprite!: AnimatedSprite
   private readonly baseSprite!: PIXI.Sprite
   private readonly rightArmSprite!: AnimatedSprite
+  private readonly smileSprite!: PIXI.Sprite
 
   constructor (app: PIXI.Application, scale: number = 0.5) {
     super()
@@ -26,6 +29,7 @@ export class Toriko extends PIXI.Container {
     const standTexture = PIXI.Texture.from('torikoStand')
     this.baseSprite = new PIXI.Sprite(standTexture)
     this.baseSprite.name = 'torikoBase'
+
     // shadow
     const shadowGraphics = new PIXI.Graphics()
     shadowGraphics.beginFill(0x000000, 0.15)
@@ -36,16 +40,22 @@ export class Toriko extends PIXI.Container {
     this.baseSprite.addChildAt(shadowGraphics, 0)
     this.addChild(this.baseSprite)
 
+    // smile
+    this.smileSprite = PIXI.Sprite.from('torikoSmile')
+    this.smileSprite.name = 'smile'
+    this.smileSprite.visible = false
+    this.addChild(this.smileSprite)
+
     this.setWlakSprite()
 
     // position
     this.x = this.app.renderer.width - this.width
-    this.y = this.app.renderer.height - this.height * 1.1 - 5
+    this.y = this.app.renderer.height - 375
 
     // animation loop
     this.app.ticker.add(() => {
-      if (this.x + this.width * scale < 0) {
-        this.stop()
+      if (this.x + this.width < 0) {
+        this.x = app.renderer.width
       } else {
         if (this.isWalking) {
           this.x -= 6 * scale
@@ -73,38 +83,58 @@ export class Toriko extends PIXI.Container {
     shadowGraphics.y = this.baseSprite.height - 10
     this.walkSprite.addChildAt(shadowGraphics, 0)
 
+    // arm
+    const walkArmSpriteSrc = ['torikoWalkArm1', 'torikoWalkArm2', 'torikoWalkArm3', 'torikoWalkArm4', 'torikoWalkArm5', 'torikoWalkArm6', 'torikoWalkArm7', 'torikoWalkArm8']
+    const walkArmTextures = walkArmSpriteSrc.map(src => PIXI.Texture.from(src))
+    this.walkArmSprite = new PIXI.AnimatedSprite(walkArmTextures)
+    this.walkArmSprite.name = 'torikoWalkArm'
+    this.walkArmSprite.animationSpeed = 0.1
+    this.walkArmSprite.loop = true
+    this.walkArmSprite.visible = false
+    this.walkArmSprite.play()
+
+    // add
+    this.addChild(this.walkArmSprite)
     this.addChild(this.walkSprite)
   }
 
   smile () {
-    let smileSprite = this.getChildByName('smile')
-    if (smileSprite === null) {
-      smileSprite = PIXI.Sprite.from('torikoSmile')
-      smileSprite.name = 'smile'
-      smileSprite.visible = false
-      this.addChild(smileSprite)
+    this.smileSprite.visible = !this.smileSprite.visible
+    if (this.isWalking) {
+      this.smileSprite.visible = false
     }
-    smileSprite.visible = !smileSprite.visible
   }
 
   givePresent () {
+    if (this.isWalking) {
+      this.stop()
+    }
+    // this.children.forEach((child) => {
+    //   child.visible = false
+    // })
+    this.rightArmSprite.visible = true
     this.rightArmSprite.gotoAndPlay(0)
     this.rightArmSprite.onComplete = () => {
       this.smile()
+      this.hasPresent = false
     }
   }
 
   walk () {
     this.isWalking = true
-    this.rightArmSprite.visible = false
+    this.children.forEach((child) => {
+      child.visible = false
+    })
     this.walkSprite.visible = true
-    this.baseSprite.visible = false
+    this.walkArmSprite.visible = this.hasPresent
   }
 
   stop () {
-    this.rightArmSprite.visible = true
-    this.walkSprite.visible = false
-    this.baseSprite.visible = true
     this.isWalking = false
+    this.children.forEach((child) => {
+      child.visible = false
+    })
+    this.rightArmSprite.visible = this.hasPresent
+    this.baseSprite.visible = true
   }
 }

@@ -7,17 +7,21 @@ export class Coco extends PIXI.Container {
   isRunning: boolean = false
   orirentation: 'left' | 'right' = 'left'
   private readonly baseSprite!: PIXI.Sprite
+  private reverseWalkPatchSprite!: PIXI.Sprite
+  private faceUpSprite!: PIXI.Sprite
+  private reverseFaceUpSprite!: PIXI.Sprite
+  private surpriseSprite!: PIXI.Sprite
   private walkSprite!: AnimatedSprite
   private runSprite!: AnimatedSprite
   private downSprite!: AnimatedSprite
   private turnLeftSprite!: AnimatedSprite
-  private reverseWalkPatchSprite!: PIXI.Sprite
   private reverseTurnPatchSprite!: AnimatedSprite
   private reverseRunPatchSprite!: AnimatedSprite
   private reverseDownPatchSprite!: AnimatedSprite
   private eyeCloseSprite!: AnimatedSprite
   private eyeBlinkSprite!: AnimatedSprite
   private downSmileSprite!: AnimatedSprite
+  private removeCoverSprite!: PIXI.AnimatedSprite
   private readonly turnMargin = 50
 
   constructor (app: PIXI.Application, scale: number = 0.5) {
@@ -41,9 +45,11 @@ export class Coco extends PIXI.Container {
     this.addChild(baseSprite)
     this.baseSprite = baseSprite
 
+    this.faceUpSprite = PIXI.Sprite.from('cocoFaceUp')
+
     // initial position
     this.x = this.app.renderer.width / 2
-    this.y = this.app.renderer.height - this.height * 1.1
+    this.y = this.app.renderer.height - 350
 
     // animated sprites
     this.setWalkSprite()
@@ -170,6 +176,13 @@ export class Coco extends PIXI.Container {
     this.downSprite.addChildAt(shadowGraphics, 0)
 
     this.addChild(this.downSprite)
+
+    const removeCoverSrcs = ['cocoRemoveCakeCover1', 'cocoRemoveCakeCover2', 'cocoRemoveCakeCover3', 'cocoRemoveCakeCover4']
+    this.removeCoverSprite = new AnimatedSprite(removeCoverSrcs.map(src => PIXI.Texture.from(src)))
+    this.removeCoverSprite.animationSpeed = 0.1
+    this.removeCoverSprite.loop = false
+    this.removeCoverSprite.visible = false
+    this.addChild(this.removeCoverSprite)
   }
 
   private setTurnLeftSprite () {
@@ -296,6 +309,21 @@ export class Coco extends PIXI.Container {
     downSmileSprite.visible = false
     this.addChild(downSmileSprite)
     this.downSmileSprite = downSmileSprite
+
+    // face up sprite
+    this.faceUpSprite = PIXI.Sprite.from('cocoFaceUp')
+    this.faceUpSprite.visible = false
+    this.addChild(this.faceUpSprite)
+    this.reverseFaceUpSprite = PIXI.Sprite.from('cocoFaceUpReverse')
+    this.reverseFaceUpSprite.visible = false
+    this.addChild(this.reverseFaceUpSprite)
+
+    // surprise sprite
+    this.surpriseSprite = PIXI.Sprite.from('cocoEyeSurprised')
+    this.surpriseSprite.visible = false
+    const surpriseMouse = new PIXI.Sprite(PIXI.Texture.from('cocoMouseSurprised'))
+    this.surpriseSprite.addChild(surpriseMouse)
+    this.addChild(this.surpriseSprite)
   }
 
   walk () {
@@ -409,6 +437,35 @@ export class Coco extends PIXI.Container {
       this.downSmileSprite.gotoAndPlay(0)
     } else if (this.baseSprite.visible || this.walkSprite.visible) {
       smileSprite.visible = true
+    }
+  }
+
+  faceUp () {
+    if (this.isRunning || this.isWalking) {
+      this.stop()
+    }
+    this.children.forEach((child) => {
+      child.visible = false
+    })
+    this.faceUpSprite.visible = true
+    this.reverseFaceUpSprite.visible = this.orirentation === 'right'
+  }
+
+  surprised () {
+    if (this.isRunning) {
+      this.stop()
+    }
+    this.surpriseSprite.visible = true
+  }
+
+  removeCover () {
+    if (this.downSprite.visible || this.removeCoverSprite.visible) {
+      this.removeCoverSprite.visible = true
+      this.removeCoverSprite.gotoAndPlay(0)
+      this.removeCoverSprite.onComplete = () => {
+        this.removeCoverSprite.visible = false
+        this.downSprite.visible = true
+      }
     }
   }
 }

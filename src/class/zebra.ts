@@ -6,12 +6,15 @@ export class Zebra extends PIXI.Container {
   private walkSprite!: PIXI.AnimatedSprite
   private readonly smileSprite!: PIXI.Sprite
   private popperSprite!: PIXI.AnimatedSprite
+  manual: boolean = false
   isWalking: boolean = false
 
-  constructor (app: PIXI.Application, scale: number = 0.5) {
+  constructor (app: PIXI.Application, scale: number = 0.5, manual: boolean = false) {
     super()
     this.app = app
     this.scale.set(scale)
+    this.manual = manual
+
     // base
     const standTexture = PIXI.Texture.from('zebra')
     this.baseSprite = new PIXI.Sprite(standTexture)
@@ -38,7 +41,11 @@ export class Zebra extends PIXI.Container {
     this.addChild(this.smileSprite)
 
     // position
-    this.x = this.app.renderer.width - this.width
+    if (this.manual) {
+      this.x = this.app.renderer.width - this.width
+    } else {
+      this.x = this.app.renderer.width
+    }
     this.y = this.app.renderer.height - 410
 
     // animation loop
@@ -104,6 +111,7 @@ export class Zebra extends PIXI.Container {
     })
     this.popperSprite.visible = true
     this.popperSprite.gotoAndPlay(0)
+    // TODO 紙吹雪
   }
 
   walk () {

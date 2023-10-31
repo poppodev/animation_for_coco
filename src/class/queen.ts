@@ -3,10 +3,12 @@ import * as PIXI from 'pixi.js'
 export class Queen extends PIXI.Container {
   app: PIXI.Application
   private readonly baseSprite!: PIXI.Sprite
+  manual: boolean = false
 
-  constructor (app: PIXI.Application, scale: number = 0.5) {
+  constructor (app: PIXI.Application, scale: number = 0.5, manual: boolean = false) {
     super()
     this.app = app
+    this.manual = manual
 
     const baseTextire = PIXI.Texture.from('queen')
     const baseSprite = new PIXI.Sprite(baseTextire)

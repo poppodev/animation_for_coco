@@ -1,11 +1,11 @@
 import * as PIXI from 'pixi.js'
 import * as Common from './common'
-import { Coco } from './coco'
-import { Komatsu } from './komatsu'
-import { Toriko } from './toriko'
-import { Sunny } from './sunny'
-import { Queen } from './queen'
-import { Zebra } from './zebra'
+import { Coco } from './class/coco'
+import { Komatsu } from './class/komatsu'
+import { Toriko } from './class/toriko'
+import { Sunny } from './class/sunny'
+import { Queen } from './class/queen'
+import { Zebra } from './class/zebra'
 
 const app = new PIXI.Application({
   width: 1200,
@@ -28,42 +28,16 @@ async function setUp () {
   }
 
   document.getElementById('loading')!.style.display = 'none'
-
-  // background
-  const background = new PIXI.Sprite(PIXI.Texture.from('background'))
-  background.anchor.set(0.5, 1)
-  background.alpha = 0.9
-  background.x = app.renderer.width / 2
-  background.y = app.renderer.height + 150
-  app.stage.addChild(background)
-
-  // clouds
-  const clouds = new PIXI.Sprite(PIXI.Texture.from('clouds'))
-  const clouds2 = new PIXI.Sprite(PIXI.Texture.from('clouds'))
-  clouds.y = app.renderer.height / 10
-  clouds2.y = app.renderer.height / 10
-  clouds2.x = clouds.width
-  app.stage.addChild(clouds)
-  app.stage.addChild(clouds2)
-  app.ticker.add(() => {
-    clouds.x -= 0.1
-    clouds2.x -= 0.1
-    if (clouds.x < -clouds.width) {
-      clouds.x = app.renderer.width
-    }
-    if (clouds2.x < -clouds2.width) {
-      clouds2.x = app.renderer.width
-    }
-  })
+  Common.setUp(app)
 
   // characters
-  const coco = new Coco(app, 0.4)
-  const komatsu = new Komatsu(app, 0.4)
-  const toriko = new Toriko(app, 0.4)
-  const queen = new Queen(app, 0.4)
-  const sunny = new Sunny(app, 0.4)
+  const coco = new Coco(app, 0.4, true)
+  const komatsu = new Komatsu(app, 0.4, true)
+  const toriko = new Toriko(app, 0.4, true)
+  const queen = new Queen(app, 0.4, true)
+  const sunny = new Sunny(app, 0.4, true)
   queen.addChild(sunny)
-  const zebra = new Zebra(app, 0.4)
+  const zebra = new Zebra(app, 0.4, true)
 
   // triggers
   document.getElementById('coco')!.addEventListener('click', function () {

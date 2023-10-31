@@ -4,22 +4,27 @@ import { AnimatedSprite } from 'pixi.js'
 export class Komatsu extends PIXI.Container {
   app: PIXI.Application
   isWalking: boolean = false
+  manual: boolean = false
   orirentation: 'left' | 'right' = 'right'
+  walkSpeed: number = 4
   private walkSprite!: AnimatedSprite
   private readonly baseSprite!: PIXI.Sprite
+  private readonly armPushSprite!: PIXI.Sprite
   private readonly shadowGraphics!: PIXI.Graphics
   private cakeSprite!: PIXI.Sprite
   private cakeCoverSprite!: PIXI.Sprite
 
-  constructor (app: PIXI.Application, scale: number = 0.5) {
+  constructor (app: PIXI.Application, scale: number = 0.5, manual: boolean = false) {
     super()
     this.app = app
     this.scale.set(scale)
+    this.manual = manual
 
     // baseSprite
     const standTexture = PIXI.Texture.from('komatsuStand')
     this.baseSprite = new PIXI.Sprite(standTexture)
     this.baseSprite.name = 'komatsuBase'
+    this.addChild(this.baseSprite)
 
     // shadow
     this.shadowGraphics = new PIXI.Graphics()
@@ -30,9 +35,18 @@ export class Komatsu extends PIXI.Container {
     this.shadowGraphics.y = this.baseSprite.height - 30
     this.addChildAt(this.shadowGraphics, 0)
 
-    this.addChild(this.baseSprite)
+    // armPushSprite
+    const armPushTexture = PIXI.Texture.from('komatsuArmPush')
+    this.armPushSprite = new PIXI.Sprite(armPushTexture)
+    this.armPushSprite.name = 'komatsuArmPush'
+    this.armPushSprite.visible = false
+    this.addChild(this.armPushSprite)
 
-    this.x = 0
+    if (this.manual) {
+      this.x = 0
+    } else {
+      this.x = -this.width
+    }
     this.y = this.app.renderer.height - 350
 
     // sprites
@@ -41,20 +55,30 @@ export class Komatsu extends PIXI.Container {
 
     // animation loop
     this.app.ticker.add(() => {
-      if (this.isWalking) {
-        if (this.orirentation === 'left') {
-          if (this.x + this.width < 0) {
-            this.turn()
-          }
-        } else {
-          if (this.x + this.width > this.app.renderer.width) {
-            this.turn()
+      // auto turn
+      if (this.manual) {
+        if (this.isWalking) {
+          if (this.orirentation === 'left') {
+            if (this.x + this.width < 0) {
+              this.turn()
+            }
+          } else {
+            if (this.x + this.width > this.app.renderer.width) {
+              this.turn()
+            }
           }
         }
+      } else {
+        if (this.orirentation === 'right' && (this.x > this.app.renderer.width)) {
+          console.log('stop')
+          this.x = -this.width
+          this.stop()
+        }
       }
+
       const direction = this.orirentation === 'right' ? 1 : -1
       if (this.isWalking) {
-        this.x += 4 * scale * direction
+        this.x += this.walkSpeed * scale * direction
       }
     })
   }
@@ -84,7 +108,7 @@ export class Komatsu extends PIXI.Container {
     const cakeTexture = PIXI.Texture.from('cake')
     const cakeSprite = new PIXI.Sprite(cakeTexture)
     cakeSprite.name = 'cake'
-    cakeSprite.x = 240
+    cakeSprite.x = 220
     cakeSprite.y = 318
     cakeSprite.visible = true
     this.cakeSprite = cakeSprite
@@ -93,7 +117,7 @@ export class Komatsu extends PIXI.Container {
     const cakeCoverTexture = PIXI.Texture.from('cakeCover')
     const cakeCoverSprite = new PIXI.Sprite(cakeCoverTexture)
     cakeCoverSprite.name = 'cakeCover'
-    cakeCoverSprite.x = 250
+    cakeCoverSprite.x = 220
     cakeCoverSprite.y = 320
     cakeCoverSprite.visible = true
     this.cakeCoverSprite = cakeCoverSprite
@@ -104,11 +128,13 @@ export class Komatsu extends PIXI.Container {
     this.isWalking = true
     this.walkSprite.visible = true
     this.baseSprite.visible = false
+    this.armPushSprite.visible = false
   }
 
   stop () {
     this.walkSprite.visible = false
     this.baseSprite.visible = true
+    this.armPushSprite.visible = false
     this.isWalking = false
   }
 
@@ -132,5 +158,16 @@ export class Komatsu extends PIXI.Container {
       this.addChild(smileSprite)
     }
     smileSprite.visible = !smileSprite.visible
+  }
+
+  givePresent () {
+    this.baseSprite.visible = false
+    this.armPushSprite.visible = true
+    this.cakeSprite.x += 20
+    this.cakeCoverSprite.x += 20
+  }
+
+  removeCakeCover () {
+    this.cakeCoverSprite.visible = false
   }
 }

@@ -7,11 +7,13 @@ export class Sunny extends PIXI.Container {
   private readonly smileSprite!: PIXI.Sprite
   private hairSprites!: PIXI.Sprite[]
   isDown: boolean = false
+  manual: boolean = false
 
-  constructor (app: PIXI.Application, scale: number = 0.5) {
+  constructor (app: PIXI.Application, scale: number = 0.5, manual: boolean = false) {
     super()
     this.app = app
     this.scale.set(scale)
+    this.manual = manual
 
     const baseTextire = PIXI.Texture.from('sunny')
     this.baseSprite = new PIXI.Sprite(baseTextire)

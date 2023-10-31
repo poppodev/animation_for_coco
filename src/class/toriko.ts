@@ -4,6 +4,7 @@ import { type AnimatedSprite } from 'pixi.js'
 export class Toriko extends PIXI.Container {
   app: PIXI.Application
   isWalking: boolean = false
+  manual: boolean = false
   hasPresent: boolean = true
   private walkSprite!: AnimatedSprite
   private walkArmSprite!: AnimatedSprite
@@ -11,10 +12,11 @@ export class Toriko extends PIXI.Container {
   private readonly rightArmSprite!: AnimatedSprite
   private readonly smileSprite!: PIXI.Sprite
 
-  constructor (app: PIXI.Application, scale: number = 0.5) {
+  constructor (app: PIXI.Application, scale: number = 0.5, manual: boolean = false) {
     super()
     this.app = app
     this.scale.set(scale)
+    this.manual = manual
 
     // arm
     const rightArmSrc = ['torikoArmRight1', 'torikoArmRight2', 'torikoArmRight3', 'torikoArmRight4']
@@ -49,8 +51,12 @@ export class Toriko extends PIXI.Container {
     this.setWlakSprite()
 
     // position
-    this.x = this.app.renderer.width - this.width
     this.y = this.app.renderer.height - 375
+    if (this.manual) {
+      this.x = this.app.renderer.width - this.width
+    } else {
+      this.x = this.app.renderer.width
+    }
 
     // animation loop
     this.app.ticker.add(() => {

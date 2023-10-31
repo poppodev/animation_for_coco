@@ -21,12 +21,12 @@ window.addEventListener('load', () => {
   PIXI.Assets.load(Common.imageSrcs).then(setUp)
 })
 
-function setOnEvent(_on:boolean){
+function setOnEvent (_on: boolean) {
   onEvent = _on
-  if(_on){
+  if (_on) {
     document.getElementById('HBD')!.classList.add('bg-gray-400')
     document.getElementById('HBD')!.classList.remove('bg-emerald-600')
-  }else{
+  } else {
     document.getElementById('HBD')!.classList.remove('bg-gray-400')
     document.getElementById('HBD')!.classList.add('bg-emerald-600')
   }
@@ -48,9 +48,9 @@ async function setUp () {
 
   app.stage.addChild(toriko)
   app.stage.addChild(queen)
-  app.stage.addChild(zebra)
-  app.stage.addChild(coco)
   app.stage.addChild(komatsu)
+  app.stage.addChild(coco)
+  app.stage.addChild(zebra)
 
   // coco appear
   setOnEvent(true)
@@ -89,6 +89,7 @@ async function setUp () {
     console.log('toriko!')
     // TODO
   }
+
   function komatsuAppear () {
     setOnEvent(true)
     console.log('komatsu!')
@@ -97,39 +98,55 @@ async function setUp () {
 
     const ticker = new PIXI.Ticker()
     ticker.add(async () => {
-      if (komatsu.x > -100 ) {        
-        if(!coco.hasReaction){
+      if (komatsu.x > -50) {
+        if (!coco.hasReaction) {
           await coco.reaction()
+          await Common.sleep(250)
           coco.walk()
         }
       }
-      
+
       // coco meets komatsu
-      if (komatsu.x + komatsu.width * 0.5 > coco.x) {
+      if (komatsu.x + komatsu.width * 0.5 - 18 > coco.x) {
         console.log('meet')
-        ticker.destroy()  
+        ticker.destroy()
+
+        // actions
         komatsu.stop()
         coco.stop()
         await coco.down()
         await Common.sleep(500)
         komatsu.givePresent()
         komatsu.smile()
+        await Common.sleep(1000)
+
+        // open present
+        await coco.removeCover(komatsu)
+        komatsu.cakeEffect()
         await Common.sleep(500)
-        komatsu.removeCakeCover()
-        await coco.removeCover ()
-        await Common.sleep(1000)
         coco.smile()
-        await Common.sleep(2000)
-        coco.up()
-        komatsu.smile()
-        komatsu.walk()
-        await coco.turn()
-        await Common.sleep(2000)
-        coco.walkSpeed = komatsu.walkSpeed
-        await coco.walkTo(app.renderer.width + Math.abs(coco.width))
         await Common.sleep(1000)
-        coco.turn()
-        coco.walkTo(app.renderer.width * 2 / 3).then(() => {setOnEvent(false)})
+        komatsu.smile()
+
+        // close present
+        await coco.appendCover(komatsu)
+
+        // walk to right
+        komatsu.walk()
+        await coco.standUp()
+        await Common.sleep(300)
+        await coco.turn()
+        await Common.sleep(1000)
+        coco.setWalkSpeed(komatsu.walkSpeed)
+        await coco.walkTo(app.renderer.width + Math.abs(coco.width))
+
+        // return initial position
+        await coco.turn()
+        coco.setWalkSpeed(coco.walkSpeedDefault)
+        coco.walkTo(app.renderer.width * 2 / 3).then(() => {
+          setOnEvent(false)
+          komatsu.reset()
+        })
       }
     })
     ticker.start()

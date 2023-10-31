@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { AnimatedSprite } from 'pixi.js'
+import { type Komatsu } from './komatsu'
 
 export class Coco extends PIXI.Container {
   app: PIXI.Application
@@ -9,7 +10,8 @@ export class Coco extends PIXI.Container {
   hasReaction: boolean = false
   manual: boolean = false
   orirentation: 'left' | 'right' = 'left'
-  walkSpeed: number = 6
+  readonly walkSpeedDefault: number = 6
+  walkSpeed: number = this.walkSpeedDefault
   private readonly baseSprite!: PIXI.Sprite
   private reverseWalkPatchSprite!: PIXI.Sprite
   private faceUpSprite!: PIXI.Sprite
@@ -18,6 +20,7 @@ export class Coco extends PIXI.Container {
   private walkSprite!: AnimatedSprite
   private runSprite!: AnimatedSprite
   private downSprite!: AnimatedSprite
+  private standUpSprite!: AnimatedSprite
   private turnLeftSprite!: AnimatedSprite
   private reverseTurnPatchSprite!: AnimatedSprite
   private reverseRunPatchSprite!: AnimatedSprite
@@ -26,6 +29,7 @@ export class Coco extends PIXI.Container {
   private eyeBlinkSprite!: AnimatedSprite
   private downSmileSprite!: AnimatedSprite
   private removeCoverSprite!: PIXI.AnimatedSprite
+  private appendCoverSprite!: PIXI.AnimatedSprite
   private readonly turnMargin = 50
 
   constructor (app: PIXI.Application, scale: number = 0.5, manual: boolean = false) {
@@ -187,23 +191,49 @@ export class Coco extends PIXI.Container {
     this.downSprite.name = 'cocoDown'
     this.downSprite.loop = false
     this.downSprite.visible = false
-
-    const shadowGraphics = new PIXI.Graphics()
-    shadowGraphics.beginFill(0x000000, 0.15)
-    shadowGraphics.drawEllipse(0, 0, 200, 20)
-    shadowGraphics.endFill()
-    shadowGraphics.x = this.baseSprite.width / 2
-    shadowGraphics.y = this.baseSprite.height - 30
-    this.downSprite.addChildAt(shadowGraphics, 0)
-
+    this.downSprite.addChildAt(this.downShadowGraphics(), 0)
     this.addChild(this.downSprite)
 
+    // cover remove
     const removeCoverSrcs = ['cocoRemoveCakeCover1', 'cocoRemoveCakeCover2', 'cocoRemoveCakeCover3', 'cocoRemoveCakeCover4']
     this.removeCoverSprite = new AnimatedSprite(removeCoverSrcs.map(src => PIXI.Texture.from(src)))
-    this.removeCoverSprite.animationSpeed = 0.05
+    this.removeCoverSprite.animationSpeed = 0.08
     this.removeCoverSprite.loop = false
     this.removeCoverSprite.visible = false
+    this.removeCoverSprite.name = 'removeCover'
+    this.removeCoverSprite.addChildAt(this.downShadowGraphics(), 0)
     this.addChild(this.removeCoverSprite)
+
+    // cover append
+    const appendCoverSrcs = removeCoverSrcs.reverse()
+    this.appendCoverSprite = new AnimatedSprite(appendCoverSrcs.map(src => PIXI.Texture.from(src)))
+    this.appendCoverSprite.animationSpeed = 0.08
+    this.appendCoverSprite.loop = false
+    this.appendCoverSprite.visible = false
+    this.appendCoverSprite.name = 'appendCover'
+    this.appendCoverSprite.addChildAt(this.downShadowGraphics(), 0)
+    this.addChild(this.appendCoverSprite)
+
+    // stand up
+    const srcStandUps = srcDowns.reverse()
+    const standUpTextures = srcStandUps.map(src => PIXI.Texture.from(src))
+    this.standUpSprite = new AnimatedSprite(standUpTextures)
+    this.standUpSprite.animationSpeed = 0.15
+    this.standUpSprite.name = 'cocoStandUp'
+    this.standUpSprite.loop = false
+    this.standUpSprite.visible = false
+    this.standUpSprite.addChildAt(this.downShadowGraphics(), 0)
+    this.addChild(this.standUpSprite)
+  }
+
+  private downShadowGraphics (): PIXI.Graphics {
+    const shadow = new PIXI.Graphics()
+    shadow.beginFill(0x000000, 0.15)
+    shadow.drawEllipse(0, 0, 200, 20)
+    shadow.endFill()
+    shadow.x = this.baseSprite.width / 2
+    shadow.y = this.baseSprite.height - 30
+    return shadow
   }
 
   private setTurnLeftSprite () {
@@ -348,7 +378,6 @@ export class Coco extends PIXI.Container {
   }
 
   walk () {
-    console.log('coco walking')
     this.isWalking = true
     this.isRunning = false
     this.isDown = false
@@ -363,15 +392,14 @@ export class Coco extends PIXI.Container {
 
   async walkTo (stopPointX: number): Promise<void> {
     this.isDown = false
+    if (stopPointX < this.x) {
+      this.orirentation == 'left'
+    } else {
+      this.orirentation == 'right'
+    }
+    this.walk()
+    const ticker = new PIXI.Ticker()
     await new Promise<void>((resolve) => {
-      if (stopPointX < this.x) {
-        this.orirentation == 'left'
-      } else {
-        this.orirentation == 'right'
-      }
-      this.walk()
-
-      const ticker = new PIXI.Ticker()
       ticker.add(() => {
         if ((this.orirentation == 'left' && this.x < stopPointX) ||
         (this.orirentation == 'right' && this.x > stopPointX)) {
@@ -398,7 +426,6 @@ export class Coco extends PIXI.Container {
   }
 
   stop () {
-    console.log('stop')
     this.isWalking = false
     this.isRunning = false
     this.children.forEach((child) => {
@@ -428,14 +455,20 @@ export class Coco extends PIXI.Container {
     })
   }
 
-  up () {
+  async standUp (): Promise<void> {
     this.isWalking = false
     this.isRunning = false
     this.isDown = false
     this.children.forEach((child) => {
       child.visible = false
     })
-    this.baseSprite.visible = true
+    this.standUpSprite.visible = true
+    this.standUpSprite.gotoAndPlay(0)
+    await new Promise<void>((resolve) => {
+      this.standUpSprite.onComplete = () => {
+        resolve()
+      }
+    })
   }
 
   async turn (): Promise<void> {
@@ -524,19 +557,51 @@ export class Coco extends PIXI.Container {
     }
   }
 
-  async removeCover (): Promise<void> {
-    if (this.downSprite.visible || this.removeCoverSprite.visible) {
-      this.children.forEach((child) => {
-        child.visible = false
-      })
-      this.removeCoverSprite.visible = true
-      this.removeCoverSprite.gotoAndPlay(0)
-      await new Promise<void>((resolve) => {
-        this.removeCoverSprite.onComplete = () => {
-          resolve()
-        }
-      })
+  async removeCover (komatsu: Komatsu): Promise<void> {
+    if (!this.isDown) {
+      return
     }
+
+    this.children.forEach((child) => {
+      child.visible = false
+    })
+    this.removeCoverSprite.visible = true
+    if (komatsu != null) {
+      this.removeCoverSprite.onFrameChange = () => {
+        if (this.removeCoverSprite.currentFrame === 1) {
+          komatsu.removeCakeCover()
+        }
+      }
+    }
+    this.removeCoverSprite.gotoAndPlay(0)
+    await new Promise<void>((resolve) => {
+      this.removeCoverSprite.onComplete = () => {
+        resolve()
+      }
+    })
+  }
+
+  async appendCover (komatsu: Komatsu): Promise<void> {
+    if (!this.isDown) {
+      return
+    }
+    this.children.forEach((child) => {
+      child.visible = false
+    })
+    this.appendCoverSprite.visible = true
+    if (komatsu != null) {
+      this.appendCoverSprite.onFrameChange = () => {
+        if (this.appendCoverSprite.currentFrame === 2) {
+          komatsu.appendCakeCover()
+        }
+      }
+    }
+    this.appendCoverSprite.gotoAndPlay(0)
+    await new Promise<void>((resolve) => {
+      this.appendCoverSprite.onComplete = () => {
+        resolve()
+      }
+    })
   }
 
   async reaction (): Promise<void> {
@@ -562,5 +627,10 @@ export class Coco extends PIXI.Container {
       })
       messageTicker.start()
     })
+  }
+
+  setWalkSpeed (_walkSpeed: number = 6) {
+    this.walkSpeed = _walkSpeed
+    this.walkSprite.animationSpeed = _walkSpeed / 60
   }
 }

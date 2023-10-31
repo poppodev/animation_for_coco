@@ -1,5 +1,7 @@
 import * as PIXI from 'pixi.js'
+import * as Common from '../common'
 import { AnimatedSprite } from 'pixi.js'
+import '@pixi/filter-blur'
 
 export class Komatsu extends PIXI.Container {
   app: PIXI.Application
@@ -42,16 +44,15 @@ export class Komatsu extends PIXI.Container {
     this.armPushSprite.visible = false
     this.addChild(this.armPushSprite)
 
-    if (this.manual) {
-      this.x = 0
-    } else {
-      this.x = -this.width
-    }
+    this.x = 0
     this.y = this.app.renderer.height - 350
 
     // sprites
     this.setWalkSprite()
     this.setCakeSprite()
+
+    // default
+    this.reset()
 
     // animation loop
     this.app.ticker.add(() => {
@@ -81,6 +82,17 @@ export class Komatsu extends PIXI.Container {
         this.x += this.walkSpeed * scale * direction
       }
     })
+  }
+
+  reset () {
+    if (this.manual) {
+      this.x = 0
+    } else {
+      this.x = -this.width
+    }
+    this.baseSprite.visible = true
+    this.cakeSprite.visible = true
+    this.cakeCoverSprite.visible = true
   }
 
   private setWalkSprite () {
@@ -168,6 +180,95 @@ export class Komatsu extends PIXI.Container {
   }
 
   removeCakeCover () {
+    console.log('remove cake cover')
     this.cakeCoverSprite.visible = false
+  }
+
+  appendCakeCover () {
+    console.log('append cake cover')
+    this.cakeCoverSprite.visible = true
+  }
+
+  async cakeEffect () {
+    const blurFilter = new PIXI.filters.BlurFilter()
+    blurFilter.blur = 0.5
+    blurFilter.quality = 3
+
+    //　ひし形のグラフィックを作成
+    const diamond1 = new Diamond(0.2, 0xf4ffea)
+    const diamond2 = new Diamond(0.25, 0xeaffff)
+    const diamond3 = new Diamond(0.2, 0xffeaff)
+    diamond1.x = 250
+    diamond1.y = 318
+    diamond2.x = 300
+    diamond2.y = 300
+    diamond3.x = 350
+    diamond3.y = 318
+
+    const diamondContainer = new PIXI.Container()
+    diamondContainer.addChild(diamond1)
+    diamondContainer.addChild(diamond2)
+    diamondContainer.addChild(diamond3)
+    diamondContainer.filters = [blurFilter]
+    this.addChild(diamondContainer)
+
+    const twinklingPromises = [
+      diamond1.twinkling(),
+      diamond2.twinkling(),
+      diamond3.twinkling()
+    ]
+    await Promise.all(twinklingPromises)
+  }
+}
+
+class Diamond extends PIXI.Graphics {
+  blinkFrames: number = Diamond.randomNumber(50, 80)
+  waitTimeBeforeStart: number = Diamond.randomNumber(10, 20)
+  deleteXDistance: number = Diamond.randomNumber(-10, 10)
+  hasBlinked: boolean = false
+  constructor (size: number, color: number = 0xffffff) {
+    super()
+    this.beginFill(color)
+    this.moveTo(0, 0)
+      .lineTo(100 * size, 150 * size)
+      .lineTo(200 * size, 0)
+      .lineTo(100 * size, -150 * size)
+      .lineTo(0, 0)
+      .endFill()
+    this.alpha = 0.1
+    this.pivot.set(100 * size, 0)
+  }
+
+  async twinkling (): Promise<void> {
+    await Common.sleep(this.waitTimeBeforeStart * 10)
+    const effectTicker = new PIXI.Ticker()
+    new Promise<void>((resolve) => {
+      effectTicker.add(() => {
+        if (this.alpha < 1 && !this.hasBlinked) {
+          this.alpha += 0.1
+          this.y -= 4
+          if (this.alpha >= 1) {
+            this.hasBlinked = true
+          }
+        }
+        if (this.hasBlinked) {
+          this.blinkFrames -= 1
+          if (this.blinkFrames <= 0) {
+            this.alpha -= 0.05
+            this.y += 1
+            this.x += this.deleteXDistance / 10
+            if (this.alpha <= 0) {
+              effectTicker.destroy()
+              resolve()
+            }
+          }
+        }
+      })
+      effectTicker.start()
+    })
+  }
+
+  private static randomNumber (from: number, to: number): number {
+    return Math.floor(Math.random() * (to - from + 1)) + from
   }
 }

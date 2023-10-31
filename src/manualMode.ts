@@ -87,9 +87,11 @@ async function setUp () {
   document.getElementById('komatsu')!.addEventListener('click', function () {
     if (!app.stage.children.includes(komatsu)) {
       app.stage.addChild(komatsu)
+      komatsu.cakeEffect()
     } else {
       komatsu.stop()
       komatsu.visible = !komatsu.visible
+      komatsu.cakeEffect()
     }
   })
 

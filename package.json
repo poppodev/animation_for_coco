@@ -22,6 +22,8 @@
   },
   "homepage": "https://github.com/poppodev/animation_for_coco#readme",
   "dependencies": {
+    "@pixi/filter-advanced-bloom": "^5.1.1",
+    "@pixi/filter-blur": "^7.3.2",
     "html-webpack-plugin": "^5.5.3",
     "pixi.js": "^7.3.2",
     "ts-loader": "^9.5.0",

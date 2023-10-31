@@ -21,6 +21,17 @@ window.addEventListener('load', () => {
   PIXI.Assets.load(Common.imageSrcs).then(setUp)
 })
 
+function setOnEvent(_on:boolean){
+  onEvent = _on
+  if(_on){
+    document.getElementById('HBD')!.classList.add('bg-gray-400')
+    document.getElementById('HBD')!.classList.remove('bg-emerald-600')
+  }else{
+    document.getElementById('HBD')!.classList.remove('bg-gray-400')
+    document.getElementById('HBD')!.classList.add('bg-emerald-600')
+  }
+}
+
 async function setUp () {
   console.log('startSetup')
   Common.setUp(app)
@@ -42,10 +53,10 @@ async function setUp () {
   app.stage.addChild(komatsu)
 
   // coco appear
-  onEvent = true
+  setOnEvent(true)
   coco.walkTo(app.renderer.width * 2 / 3).then(() => {
     console.log('appear done')
-    onEvent = false
+    setOnEvent(false)
   })
 
   // triggers
@@ -79,23 +90,24 @@ async function setUp () {
     // TODO
   }
   function komatsuAppear () {
-    onEvent = true
+    setOnEvent(true)
     console.log('komatsu!')
     // appear from left
     komatsu.walk()
 
     const ticker = new PIXI.Ticker()
     ticker.add(async () => {
-      if (komatsu.x > -100) {
-        if (!coco.hasReaction) {
+      if (komatsu.x > -100 ) {        
+        if(!coco.hasReaction){
           await coco.reaction()
           coco.walk()
         }
       }
-
+      
+      // coco meets komatsu
       if (komatsu.x + komatsu.width * 0.5 > coco.x) {
         console.log('meet')
-        ticker.destroy()
+        ticker.destroy()  
         komatsu.stop()
         coco.stop()
         await coco.down()
@@ -104,7 +116,7 @@ async function setUp () {
         komatsu.smile()
         await Common.sleep(500)
         komatsu.removeCakeCover()
-        await coco.removeCover()
+        await coco.removeCover ()
         await Common.sleep(1000)
         coco.smile()
         await Common.sleep(2000)
@@ -117,7 +129,7 @@ async function setUp () {
         await coco.walkTo(app.renderer.width + Math.abs(coco.width))
         await Common.sleep(1000)
         coco.turn()
-        coco.walkTo(app.renderer.width * 2 / 3).then(() => { onEvent = false })
+        coco.walkTo(app.renderer.width * 2 / 3).then(() => {setOnEvent(false)})
       }
     })
     ticker.start()

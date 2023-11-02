@@ -195,8 +195,8 @@ export class Komatsu extends PIXI.Container {
 
   async cakeEffect () {
     const sparkle = new Sparkle(0.25, 0xe6ffe9, Sparkle.randomNumber(100, 500))
-    const sparkle2 = new Sparkle(0.2, 0xf3ffd8,Sparkle.randomNumber(100, 500))
-    const sparkle3 = new Sparkle(0.25, 0xd7eeff,Sparkle.randomNumber(100, 500))
+    const sparkle2 = new Sparkle(0.2, 0xf3ffd8, Sparkle.randomNumber(100, 500))
+    const sparkle3 = new Sparkle(0.25, 0xd7eeff, Sparkle.randomNumber(100, 500))
     sparkle.x = 280
     sparkle.y = 300
     sparkle2.x = 330
@@ -222,7 +222,7 @@ export class Komatsu extends PIXI.Container {
 class Sparkle extends PIXI.Graphics {
   blinkFrames: number = Sparkle.randomNumber(40, 60)
   hasBlinked: boolean = false
-  customScale:number = 1
+  customScale: number = 1
   waitingTime: number = 0
 
   constructor (_scale: number, color: number = 0xffffff, waitingTime: number = 0) {
@@ -230,10 +230,10 @@ class Sparkle extends PIXI.Graphics {
     this.customScale = _scale
     this.beginFill(color)
     this.moveTo(0, 0)
-    this.quadraticCurveTo(100 * _scale, 0, 100*_scale, 150*_scale)
-    this.quadraticCurveTo(100 * _scale, 0, 200*_scale, 0)
-    this.quadraticCurveTo(100 * _scale, 0, 100*_scale,  -150*_scale)
-    this.quadraticCurveTo(100 * _scale, 0, 0, 0*_scale)
+    this.quadraticCurveTo(100 * _scale, 0, 100 * _scale, 150 * _scale)
+    this.quadraticCurveTo(100 * _scale, 0, 200 * _scale, 0)
+    this.quadraticCurveTo(100 * _scale, 0, 100 * _scale, -150 * _scale)
+    this.quadraticCurveTo(100 * _scale, 0, 0, 0 * _scale)
     this.lineStyle(3, color)
     this.endFill()
     this.pivot.x = 100 * _scale
@@ -250,9 +250,9 @@ class Sparkle extends PIXI.Graphics {
       effectTicker.add(() => {
         this.y += -0.5
         frame += 1
-        if(( 20 < frame && frame < 40) || ( 60 < frame && frame < 80)){
+        if ((frame > 20 && frame < 40) || (frame > 60 && frame < 80)) {
           this.scale.set(1.5)
-        }else{
+        } else {
           this.scale.set(1)
         }
         if (frame > 20) {
@@ -260,7 +260,7 @@ class Sparkle extends PIXI.Graphics {
           if (this.blinkFrames <= 0) {
             this.alpha -= 0.05
             this.y += -0.5
-            if(this.alpha <= 0){
+            if (this.alpha <= 0) {
               effectTicker.destroy()
               resolve()
             }

@@ -8,7 +8,7 @@ import { Queen } from './class/queen'
 import { Zebra } from './class/zebra'
 
 const app = new PIXI.Application({
-  width: 1200,
+  width: 1050,
   height: 600,
   backgroundColor: 0xFFFFFF,
   antialias: true
@@ -46,6 +46,8 @@ async function setUp () {
   queen.addChild(sunny)
   const zebra = new Zebra(app, 0.4)
 
+  const initialX = app.renderer.width * 2 / 3
+
   app.stage.addChild(toriko)
   app.stage.addChild(queen)
   app.stage.addChild(komatsu)
@@ -54,7 +56,7 @@ async function setUp () {
 
   // coco appear
   setOnEvent(true)
-  coco.walkTo(app.renderer.width * 2 / 3).then(() => {
+  coco.walkTo(initialX).then(() => {
     console.log('appear done')
     setOnEvent(false)
   })
@@ -92,13 +94,12 @@ async function setUp () {
 
   function komatsuAppear () {
     setOnEvent(true)
-    console.log('komatsu!')
     // appear from left
     komatsu.walk()
 
     const ticker = new PIXI.Ticker()
     ticker.add(async () => {
-      if (komatsu.x > -50) {
+      if (komatsu.x > -45) {
         if (!coco.hasReaction) {
           await coco.reaction()
           await Common.sleep(250)
@@ -107,8 +108,7 @@ async function setUp () {
       }
 
       // coco meets komatsu
-      if (komatsu.x + komatsu.width * 0.5 - 18 > coco.x) {
-        console.log('meet')
+      if (komatsu.x + komatsu.width * 0.5 - 13 > coco.x) {
         ticker.destroy()
 
         // actions
@@ -117,7 +117,6 @@ async function setUp () {
         await coco.down()
         await Common.sleep(500)
         komatsu.givePresent()
-        komatsu.smile()
         await Common.sleep(1000)
 
         // open present
@@ -125,25 +124,26 @@ async function setUp () {
         komatsu.cakeEffect()
         await Common.sleep(500)
         coco.smile()
-        await Common.sleep(1000)
         komatsu.smile()
+        await Common.sleep(2000)
 
         // close present
         await coco.appendCover(komatsu)
 
         // walk to right
         komatsu.walk()
+        komatsu.smile() // smile off
         await coco.standUp()
         await Common.sleep(300)
         await coco.turn()
-        await Common.sleep(1000)
         coco.setWalkSpeed(komatsu.walkSpeed)
+        await Common.sleep(1200)
         await coco.walkTo(app.renderer.width + Math.abs(coco.width))
 
-        // return initial position
+        // back to initial position
         await coco.turn()
         coco.setWalkSpeed(coco.walkSpeedDefault)
-        coco.walkTo(app.renderer.width * 2 / 3).then(() => {
+        coco.walkTo(initialX).then(() => {
           setOnEvent(false)
           komatsu.reset()
         })
@@ -151,6 +151,7 @@ async function setUp () {
     })
     ticker.start()
   }
+
   function sunnyAppear () {
     console.log('sunny!')
     // TODO

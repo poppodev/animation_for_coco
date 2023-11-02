@@ -9,6 +9,8 @@ export class Komatsu extends PIXI.Container {
   manual: boolean = false
   orirentation: 'left' | 'right' = 'right'
   walkSpeed: number = 4
+  cakeDefaultX: number = 220
+  cakeDefaultY: number = 318
   private walkSprite!: AnimatedSprite
   private readonly baseSprite!: PIXI.Sprite
   private readonly armPushSprite!: PIXI.Sprite
@@ -71,7 +73,6 @@ export class Komatsu extends PIXI.Container {
         }
       } else {
         if (this.orirentation === 'right' && (this.x > this.app.renderer.width)) {
-          console.log('stop')
           this.x = -this.width
           this.stop()
         }
@@ -120,8 +121,8 @@ export class Komatsu extends PIXI.Container {
     const cakeTexture = PIXI.Texture.from('cake')
     const cakeSprite = new PIXI.Sprite(cakeTexture)
     cakeSprite.name = 'cake'
-    cakeSprite.x = 220
-    cakeSprite.y = 318
+    cakeSprite.x = this.cakeDefaultX
+    cakeSprite.y = this.cakeDefaultY
     cakeSprite.visible = true
     this.cakeSprite = cakeSprite
     this.addChildAt(cakeSprite, 0)
@@ -129,8 +130,8 @@ export class Komatsu extends PIXI.Container {
     const cakeCoverTexture = PIXI.Texture.from('cakeCover')
     const cakeCoverSprite = new PIXI.Sprite(cakeCoverTexture)
     cakeCoverSprite.name = 'cakeCover'
-    cakeCoverSprite.x = 220
-    cakeCoverSprite.y = 320
+    cakeCoverSprite.x = this.cakeDefaultX
+    cakeCoverSprite.y = this.cakeDefaultY
     cakeCoverSprite.visible = true
     this.cakeCoverSprite = cakeCoverSprite
     this.addChildAt(cakeCoverSprite, 1)
@@ -141,6 +142,10 @@ export class Komatsu extends PIXI.Container {
     this.walkSprite.visible = true
     this.baseSprite.visible = false
     this.armPushSprite.visible = false
+    this.cakeCoverSprite.x = this.cakeDefaultX
+    this.cakeCoverSprite.y = this.cakeDefaultY
+    this.cakeSprite.x = this.cakeDefaultX
+    this.cakeSprite.y = this.cakeDefaultY
   }
 
   stop () {
@@ -158,7 +163,6 @@ export class Komatsu extends PIXI.Container {
       this.x -= this.width
       this.walk()
     }
-    console.log(this.orirentation)
   }
 
   smile () {
@@ -175,8 +179,8 @@ export class Komatsu extends PIXI.Container {
   givePresent () {
     this.baseSprite.visible = false
     this.armPushSprite.visible = true
-    this.cakeSprite.x += 20
-    this.cakeCoverSprite.x += 20
+    this.cakeSprite.x += 28
+    this.cakeCoverSprite.x += 28
   }
 
   removeCakeCover () {
@@ -190,14 +194,14 @@ export class Komatsu extends PIXI.Container {
   }
 
   async cakeEffect () {
-    const sparkle = new Sparkle(0.3, 0x04ffea)
-    const sparkle2 = new Sparkle(0.2, 0xeaffff)
-    const sparkle3 = new Sparkle(0.3, 0xffeaff)
-    sparkle.x = 250
+    const sparkle = new Sparkle(0.25, 0xe6ffe9, Sparkle.randomNumber(100, 500))
+    const sparkle2 = new Sparkle(0.2, 0xf3ffd8,Sparkle.randomNumber(100, 500))
+    const sparkle3 = new Sparkle(0.25, 0xd7eeff,Sparkle.randomNumber(100, 500))
+    sparkle.x = 280
     sparkle.y = 300
-    sparkle2.x = 310
+    sparkle2.x = 330
     sparkle2.y = 310
-    sparkle3.x = 380
+    sparkle3.x = 400
     sparkle3.y = 305
 
     const sparkleContainer = new PIXI.Container()
@@ -219,8 +223,9 @@ class Sparkle extends PIXI.Graphics {
   blinkFrames: number = Sparkle.randomNumber(40, 60)
   hasBlinked: boolean = false
   customScale:number = 1
+  waitingTime: number = 0
 
-  constructor (_scale: number, color: number = 0xffffff) {
+  constructor (_scale: number, color: number = 0xffffff, waitingTime: number = 0) {
     super()
     this.customScale = _scale
     this.beginFill(color)
@@ -231,31 +236,31 @@ class Sparkle extends PIXI.Graphics {
     this.quadraticCurveTo(100 * _scale, 0, 0, 0*_scale)
     this.lineStyle(3, color)
     this.endFill()
-    this.blendMode = PIXI.BLEND_MODES.SCREEN
     this.pivot.x = 100 * _scale
     this.pivot.y = 0
     this.scale.set(0)
+    this.waitingTime = waitingTime
   }
 
   async blink (): Promise<void> {
     const effectTicker = new PIXI.Ticker()
+    await Common.sleep(this.waitingTime)
     new Promise<void>((resolve) => {
+      let frame = 0
       effectTicker.add(() => {
-        if (this.scale.x < 1 && !this.hasBlinked) {
-          this.scale.set(this.scale.x + 0.15)
-          if (this.scale.x >= 1) {
-            console.log('blink')
-            this.hasBlinked = true
-          }
+        this.y += -0.5
+        frame += 1
+        if(( 20 < frame && frame < 40) || ( 60 < frame && frame < 80)){
+          this.scale.set(1.5)
+        }else{
+          this.scale.set(1)
         }
-        if (this.hasBlinked) {
+        if (frame > 20) {
           this.blinkFrames -= 1
-          console.log('hasBlinked')
           if (this.blinkFrames <= 0) {
             this.alpha -= 0.05
             this.y += -0.5
             if(this.alpha <= 0){
-              console.log('destroy')
               effectTicker.destroy()
               resolve()
             }
@@ -266,7 +271,7 @@ class Sparkle extends PIXI.Graphics {
     })
   }
 
-  private static randomNumber (from: number, to: number): number {
+  static randomNumber (from: number, to: number): number {
     return Math.floor(Math.random() * (to - from + 1)) + from
   }
 }

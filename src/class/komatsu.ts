@@ -190,74 +190,72 @@ export class Komatsu extends PIXI.Container {
   }
 
   async cakeEffect () {
-    const blurFilter = new PIXI.filters.BlurFilter()
-    blurFilter.blur = 0.5
-    blurFilter.quality = 3
+    const sparkle = new Sparkle(0.3, 0x04ffea)
+    const sparkle2 = new Sparkle(0.2, 0xeaffff)
+    const sparkle3 = new Sparkle(0.3, 0xffeaff)
+    sparkle.x = 250
+    sparkle.y = 300
+    sparkle2.x = 310
+    sparkle2.y = 310
+    sparkle3.x = 380
+    sparkle3.y = 305
 
-    //　ひし形のグラフィックを作成
-    const diamond1 = new Diamond(0.2, 0xf4ffea)
-    const diamond2 = new Diamond(0.25, 0xeaffff)
-    const diamond3 = new Diamond(0.2, 0xffeaff)
-    diamond1.x = 250
-    diamond1.y = 318
-    diamond2.x = 300
-    diamond2.y = 300
-    diamond3.x = 350
-    diamond3.y = 318
+    const sparkleContainer = new PIXI.Container()
+    sparkleContainer.addChild(sparkle)
+    sparkleContainer.addChild(sparkle2)
+    sparkleContainer.addChild(sparkle3)
+    this.addChild(sparkleContainer)
 
-    const diamondContainer = new PIXI.Container()
-    diamondContainer.addChild(diamond1)
-    diamondContainer.addChild(diamond2)
-    diamondContainer.addChild(diamond3)
-    diamondContainer.filters = [blurFilter]
-    this.addChild(diamondContainer)
-
-    const twinklingPromises = [
-      diamond1.twinkling(),
-      diamond2.twinkling(),
-      diamond3.twinkling()
+    const blinkPromises = [
+      sparkle.blink(),
+      sparkle2.blink(),
+      sparkle3.blink()
     ]
-    await Promise.all(twinklingPromises)
+    await Promise.all(blinkPromises)
   }
 }
 
-class Diamond extends PIXI.Graphics {
-  blinkFrames: number = Diamond.randomNumber(50, 80)
-  waitTimeBeforeStart: number = Diamond.randomNumber(10, 20)
-  deleteXDistance: number = Diamond.randomNumber(-10, 10)
+class Sparkle extends PIXI.Graphics {
+  blinkFrames: number = Sparkle.randomNumber(40, 60)
   hasBlinked: boolean = false
-  constructor (size: number, color: number = 0xffffff) {
+  customScale:number = 1
+
+  constructor (_scale: number, color: number = 0xffffff) {
     super()
+    this.customScale = _scale
     this.beginFill(color)
     this.moveTo(0, 0)
-      .lineTo(100 * size, 150 * size)
-      .lineTo(200 * size, 0)
-      .lineTo(100 * size, -150 * size)
-      .lineTo(0, 0)
-      .endFill()
-    this.alpha = 0.1
-    this.pivot.set(100 * size, 0)
+    this.quadraticCurveTo(100 * _scale, 0, 100*_scale, 150*_scale)
+    this.quadraticCurveTo(100 * _scale, 0, 200*_scale, 0)
+    this.quadraticCurveTo(100 * _scale, 0, 100*_scale,  -150*_scale)
+    this.quadraticCurveTo(100 * _scale, 0, 0, 0*_scale)
+    this.lineStyle(3, color)
+    this.endFill()
+    this.blendMode = PIXI.BLEND_MODES.SCREEN
+    this.pivot.x = 100 * _scale
+    this.pivot.y = 0
+    this.scale.set(0)
   }
 
-  async twinkling (): Promise<void> {
-    await Common.sleep(this.waitTimeBeforeStart * 10)
+  async blink (): Promise<void> {
     const effectTicker = new PIXI.Ticker()
     new Promise<void>((resolve) => {
       effectTicker.add(() => {
-        if (this.alpha < 1 && !this.hasBlinked) {
-          this.alpha += 0.1
-          this.y -= 4
-          if (this.alpha >= 1) {
+        if (this.scale.x < 1 && !this.hasBlinked) {
+          this.scale.set(this.scale.x + 0.15)
+          if (this.scale.x >= 1) {
+            console.log('blink')
             this.hasBlinked = true
           }
         }
         if (this.hasBlinked) {
           this.blinkFrames -= 1
+          console.log('hasBlinked')
           if (this.blinkFrames <= 0) {
             this.alpha -= 0.05
-            this.y += 1
-            this.x += this.deleteXDistance / 10
-            if (this.alpha <= 0) {
+            this.y += -0.5
+            if(this.alpha <= 0){
+              console.log('destroy')
               effectTicker.destroy()
               resolve()
             }

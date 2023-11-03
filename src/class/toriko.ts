@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { type AnimatedSprite } from 'pixi.js'
+import { tokenToString } from 'typescript'
 
 export class Toriko extends PIXI.Container {
   app: PIXI.Application
@@ -51,21 +52,18 @@ export class Toriko extends PIXI.Container {
     this.setWlakSprite()
 
     // position
-    this.y = this.app.renderer.height - 375
-    if (this.manual) {
-      this.x = this.app.renderer.width - this.width
-    } else {
-      this.x = this.app.renderer.width
-    }
+    this.reset()
 
     // animation loop
     this.app.ticker.add(() => {
       if (this.x + this.width < 0) {
-        this.x = app.renderer.width
-      } else {
-        if (this.isWalking) {
-          this.x -= 6 * scale
+        if (this.manual) {
+          this.x = app.renderer.width
+        } else {
+          this.stop()
         }
+      } else if (this.isWalking) {
+        this.x -= 6 * scale
       }
     })
   }
@@ -104,6 +102,16 @@ export class Toriko extends PIXI.Container {
     this.addChild(this.walkSprite)
   }
 
+  reset () {
+    this.y = this.app.renderer.height - 375
+    if (this.manual) {
+      this.x = this.app.renderer.width - this.width
+    } else {
+      this.x = this.app.renderer.width
+    }
+    this.baseSprite.visible = true
+  }
+
   smile () {
     this.smileSprite.visible = !this.smileSprite.visible
     if (this.isWalking) {
@@ -111,19 +119,19 @@ export class Toriko extends PIXI.Container {
     }
   }
 
-  givePresent () {
-    if (this.isWalking) {
-      this.stop()
-    }
-    // this.children.forEach((child) => {
-    //   child.visible = false
-    // })
-    this.rightArmSprite.visible = true
-    this.rightArmSprite.gotoAndPlay(0)
-    this.rightArmSprite.onComplete = () => {
-      this.smile()
-      this.hasPresent = false
-    }
+  async givePresent () {
+    await new Promise<void>((resolve) => {
+      if (this.isWalking) {
+        this.stop()
+      }
+      this.rightArmSprite.visible = true
+      this.rightArmSprite.gotoAndPlay(0)
+      this.rightArmSprite.onComplete = () => {
+        this.smile()
+        this.hasPresent = false
+        resolve()
+      }
+    })
   }
 
   walk () {
@@ -142,5 +150,10 @@ export class Toriko extends PIXI.Container {
     })
     this.rightArmSprite.visible = this.hasPresent
     this.baseSprite.visible = true
+  }
+
+  removeGift () {
+    this.hasPresent = false
+    this.rightArmSprite.visible = false
   }
 }

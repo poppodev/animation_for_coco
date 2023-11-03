@@ -166,8 +166,8 @@ export function setUp (app: PIXI.Application) {
   app.stage.addChild(clouds)
   app.stage.addChild(clouds2)
   app.ticker.add(() => {
-    clouds.x -= 0.1
-    clouds2.x -= 0.1
+    clouds.x -= 0.15
+    clouds2.x -= 0.15
     if (clouds.x < -clouds.width) {
       clouds.x = app.renderer.width
     }
@@ -179,4 +179,8 @@ export function setUp (app: PIXI.Application) {
 
 export async function sleep (ms: number) {
   return await new Promise(resolve => setTimeout(resolve, ms))
+}
+
+export function deg2rad (degree: number) {
+  return degree * Math.PI / 180
 }

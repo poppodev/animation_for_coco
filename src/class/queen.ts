@@ -20,7 +20,7 @@ export class Queen extends PIXI.Container {
     this.y = -this.height
   }
 
-  appear () {
+  async appear (): Promise<void> {
     console.log('appear')
     this.visible = true
     const stopPointX = this.app.renderer.width / 4
@@ -37,18 +37,21 @@ export class Queen extends PIXI.Container {
     const xStep = (stopPointX - startPointX) / duration
     const yStep = (stopPointY - startPointY) / duration
     const appearTicker = new PIXI.Ticker()
-    appearTicker.add(() => {
-      if (this.x < stopPointX) {
-        this.x += xStep
-        this.y += yStep
-      } else {
-        appearTicker.destroy()
-      }
+    await new Promise<void>((resolve) => {
+      appearTicker.add(() => {
+        if (this.x < stopPointX) {
+          this.x += xStep
+          this.y += yStep
+        } else {
+          resolve()
+          appearTicker.destroy()
+        }
+      })
+      appearTicker.start()
     })
-    appearTicker.start()
   }
 
-  getOut () {
+  async getOut (): Promise<void> {
     console.log('getOut')
     const stopPointX = this.app.renderer.width * 2 / 3
     const stopPointY = -this.height
@@ -64,15 +67,18 @@ export class Queen extends PIXI.Container {
     const xStep = (stopPointX - startPointX) / duration
     const yStep = (stopPointY - startPointY) / duration
     const appearTicker = new PIXI.Ticker()
-    appearTicker.add(() => {
-      if (this.x < stopPointX) {
-        this.x += xStep
-        this.y += yStep
-      } else {
-        this.visible = false
-        appearTicker.destroy()
-      }
+    await new Promise<void>((resolve) => {
+      appearTicker.add(() => {
+        if (this.x < stopPointX) {
+          this.x += xStep
+          this.y += yStep
+        } else {
+          this.visible = false
+          appearTicker.destroy()
+          resolve()
+        }
+      })
+      appearTicker.start()
     })
-    appearTicker.start()
   }
 }

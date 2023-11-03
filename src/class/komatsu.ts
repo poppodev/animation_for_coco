@@ -179,8 +179,8 @@ export class Komatsu extends PIXI.Container {
   givePresent () {
     this.baseSprite.visible = false
     this.armPushSprite.visible = true
-    this.cakeSprite.x += 28
-    this.cakeCoverSprite.x += 28
+    this.cakeSprite.x += 33
+    this.cakeCoverSprite.x += 33
   }
 
   removeCakeCover () {

@@ -27,8 +27,6 @@ export class Sunny extends PIXI.Container {
     const armTexture = PIXI.Texture.from('sunnyArm')
     this.armSprite = new PIXI.Sprite(armTexture)
     this.armSprite.name = 'sunnyArm'
-
-    // 320,300
     this.armSprite.anchor.set(320 / 600, 300 / 700)
     this.armSprite.x = 800 * this.scale.x
     this.armSprite.y = 750 * this.scale.y
@@ -64,17 +62,31 @@ export class Sunny extends PIXI.Container {
     smileSprite.visible = !smileSprite.visible
   }
 
-  givePresent () {
+  async givePresent (on: boolean = true) {
     const duration = 20
     const stopAngle = 60
-    const step = stopAngle / duration * ((Math.round(this.armSprite.rotation) >= 0) ? -1 : 1)
+    let step = stopAngle / duration
+    if (on || Math.round(this.armSprite.rotation) >= 0) {
+      step *= -1
+    }
     let currentAngle = 0
 
-    this.app.ticker.add(() => {
-      if ((step < 0 && currentAngle >= -stopAngle) || (step > 0 && currentAngle <= stopAngle)) {
-        this.armSprite.rotation += step * Math.PI / 180
-        currentAngle += step
-      }
+    new Promise<void>((resolve) => {
+      this.app.ticker.add(() => {
+        if ((step < 0 && currentAngle >= -stopAngle) || (step > 0 && currentAngle <= stopAngle)) {
+          this.armSprite.rotation += step * Math.PI / 180
+          currentAngle += step
+          resolve()
+        }
+      })
     })
+  }
+
+  removeFlowers () {
+    this.armSprite.texture = PIXI.Texture.from('sunnyArmFree')
+  }
+
+  reset () {
+    this.armSprite.texture = PIXI.Texture.from('sunnyArm')
   }
 }

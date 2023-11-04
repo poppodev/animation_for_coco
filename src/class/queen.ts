@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { Sunny } from './sunny'
+import * as Common from '../common'
 
 export class Queen extends PIXI.Container {
   app: PIXI.Application
@@ -26,12 +27,14 @@ export class Queen extends PIXI.Container {
     this.visible = true  
     const sunny : Sunny = this.getChildByName('sunny') as Sunny
     setTimeout(() => { sunny.smile() }, 1000)
+    sunny.reset()
     sunny.setDown(true)
 
     await this.appearDown()
     await this.moveVertical(20, 3)
     await this.moveVertical(20, -3)
 
+    // await Common.sleep(600)
     sunny.setDown(false)
     sunny.hairBound()
   }

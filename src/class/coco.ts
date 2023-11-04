@@ -688,4 +688,9 @@ export class Coco extends PIXI.Container {
     this.walkSpeed = _walkSpeed
     this.walkSprite.animationSpeed = _walkSpeed / 60
   }
+
+  async getFlower(): Promise<void> {
+    // TODO
+    await Common.sleep(2000)
+  }
 }

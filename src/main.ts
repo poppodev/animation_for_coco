@@ -262,14 +262,14 @@ async function setUp () {
     await Promise.all([comeCoco(), queen.appear()])
 
     coco.faceUp()
-    await Common.sleep(500)
+    await Common.sleep(1500)
     sunny.smile()
     await sunny.givePresent(true)
-    await Common.sleep(1000)
+    await Common.sleep(2000)
     coco.smile()
 
-    // TODO cocoがflowerを受け取る
     sunny.removeFlowers()
+    await coco.getFlower()
     await sunny.givePresent(false)
 
     await Common.sleep(1000)

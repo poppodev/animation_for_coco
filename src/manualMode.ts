@@ -6,9 +6,10 @@ import { Toriko } from './class/toriko'
 import { Sunny } from './class/sunny'
 import { Queen } from './class/queen'
 import { Zebra } from './class/zebra'
+import './styles/index.css';
 
 const app = new PIXI.Application({
-  width: 1200,
+  width: 1050,
   height: 600,
   backgroundColor: 0xFFFFFF,
   antialias: true

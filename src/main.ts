@@ -6,6 +6,7 @@ import { Toriko } from './class/toriko'
 import { Sunny } from './class/sunny'
 import { Queen } from './class/queen'
 import { Zebra } from './class/zebra'
+import './styles/index.css';
 
 const app = new PIXI.Application({
   width: 1050,
@@ -256,7 +257,7 @@ async function setUp () {
   async function sunnyAppear () {
     setOnEvent(true)
 
-    const startPointX = initialX - 50
+    const startPointX = initialX - 160
 
     await Promise.all([comeCoco(), queen.appear()])
 
@@ -281,10 +282,10 @@ async function setUp () {
     async function awayAndInitialCoco (): Promise<void> {
       console.log('awayAndInitialCoco')
       await new Promise<void>(async (resolve): Promise<void> => {
+        setTimeout(() => {coco.smile()}, 1000)
+        await coco.walkTo(0 - coco.width)
         await coco.turn()
-        await coco.walkTo(app.renderer.width)
-        await coco.turn()
-        await coco.walkTo(initialX)
+        await coco.walkTo(app.renderer.width-initialX + coco.width)
         resolve()
       })
     }

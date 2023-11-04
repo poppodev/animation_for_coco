@@ -184,3 +184,11 @@ export async function sleep (ms: number) {
 export function deg2rad (degree: number) {
   return degree * Math.PI / 180
 }
+
+export function rad2deg (radian: number) {
+  return radian * 180 / Math.PI
+}
+
+export function randomNumber (from: number, to: number): number {
+  return Math.floor(Math.random() * (to - from + 1)) + from
+}

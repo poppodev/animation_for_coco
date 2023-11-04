@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js'
+import { Sunny } from './sunny'
 
 export class Queen extends PIXI.Container {
   app: PIXI.Application
@@ -22,37 +23,82 @@ export class Queen extends PIXI.Container {
 
   async appear (): Promise<void> {
     console.log('appear')
-    this.visible = true
-    const stopPointX = this.app.renderer.width / 4
+    this.visible = true  
+    const sunny : Sunny = this.getChildByName('sunny') as Sunny
+    setTimeout(() => { sunny.smile() }, 1000)
+    sunny.setDown(true)
+
+    await this.appearDown()
+    await this.moveVertical(20, 3)
+    await this.moveVertical(20, -3)
+
+    sunny.setDown(false)
+    sunny.hairBound()
+  }
+
+  async getOut (): Promise<void> {
+    const sunny : Sunny = this.getChildByName('sunny') as Sunny
+    sunny.setUp(true)
+    await this.moveVertical(20, 3)
+    await this.moveVertical(20, -3)    
+    await this.getOutUp()
+    this.visible = false
+    sunny.setUp(false)
+  }
+
+  private async appearDown(){
+    const stopPointX = 150
     const stopPointY = -260 * this.baseSprite.scale.y
 
-    const startPointX = this.x = this.app.renderer.width / 6
+    const startPointX = 0
     const startPointY = -this.height
 
     // start position
     this.x = startPointX
     this.y = startPointY
 
+    if(this.getChildByName('sunny') !== null) {
+      const sunny = this.getChildByName('sunny') as Sunny
+      sunny.setDown(true)
+    }
+
     const duration = 120
     const xStep = (stopPointX - startPointX) / duration
     const yStep = (stopPointY - startPointY) / duration
+
     const appearTicker = new PIXI.Ticker()
-    await new Promise<void>((resolve) => {
-      appearTicker.add(() => {
+    return await new Promise<void>((resolve) => {
+      appearTicker.add(async () => {
         if (this.x < stopPointX) {
           this.x += xStep
           this.y += yStep
-        } else {
+        }else{
           resolve()
           appearTicker.destroy()
-        }
+        }          
       })
       appearTicker.start()
     })
   }
 
-  async getOut (): Promise<void> {
-    console.log('getOut')
+
+  private async moveVertical (distance:number,step:number): Promise<void> {
+   const ticker = new PIXI.Ticker()
+   let moved = 0
+   return new Promise<void>((resolve) => {
+    ticker.add(() => {
+      this.y += step
+      moved += step
+      if(Math.abs(moved) >= distance){
+        resolve()
+        ticker.destroy()
+      }
+     })
+     ticker.start()
+   })
+  }
+
+  private async getOutUp (): Promise<void> {
     const stopPointX = this.app.renderer.width * 2 / 3
     const stopPointY = -this.height
 
@@ -73,9 +119,8 @@ export class Queen extends PIXI.Container {
           this.x += xStep
           this.y += yStep
         } else {
-          this.visible = false
-          appearTicker.destroy()
           resolve()
+          appearTicker.destroy()
         }
       })
       appearTicker.start()

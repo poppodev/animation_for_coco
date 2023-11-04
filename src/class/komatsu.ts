@@ -194,9 +194,9 @@ export class Komatsu extends PIXI.Container {
   }
 
   async cakeEffect () {
-    const sparkle = new Sparkle(0.25, 0xe6ffe9, Sparkle.randomNumber(100, 500))
-    const sparkle2 = new Sparkle(0.2, 0xf3ffd8, Sparkle.randomNumber(100, 500))
-    const sparkle3 = new Sparkle(0.25, 0xd7eeff, Sparkle.randomNumber(100, 500))
+    const sparkle = new Sparkle(0.25, 0xe6ffe9, Common.randomNumber(100, 500))
+    const sparkle2 = new Sparkle(0.2, 0xf3ffd8, Common.randomNumber(100, 500))
+    const sparkle3 = new Sparkle(0.25, 0xd7eeff, Common.randomNumber(100, 500))
     sparkle.x = 280
     sparkle.y = 300
     sparkle2.x = 330
@@ -220,7 +220,7 @@ export class Komatsu extends PIXI.Container {
 }
 
 class Sparkle extends PIXI.Graphics {
-  blinkFrames: number = Sparkle.randomNumber(40, 60)
+  blinkFrames: number = Common.randomNumber(40, 60)
   hasBlinked: boolean = false
   customScale: number = 1
   waitingTime: number = 0
@@ -269,9 +269,5 @@ class Sparkle extends PIXI.Graphics {
       })
       effectTicker.start()
     })
-  }
-
-  static randomNumber (from: number, to: number): number {
-    return Math.floor(Math.random() * (to - from + 1)) + from
   }
 }

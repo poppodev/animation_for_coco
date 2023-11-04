@@ -1,12 +1,12 @@
 import * as PIXI from 'pixi.js'
+import * as Common from '../common'
 
 export class Sunny extends PIXI.Container {
   app: PIXI.Application
   private readonly baseSprite!: PIXI.Sprite
   private readonly armSprite!: PIXI.Sprite
   private readonly smileSprite!: PIXI.Sprite
-  private hairSprites!: PIXI.Sprite[]
-  isDown: boolean = false
+  private hairSprites!: Hair[]
   manual: boolean = false
 
   constructor (app: PIXI.Application, scale: number = 0.5, manual: boolean = false) {
@@ -14,6 +14,7 @@ export class Sunny extends PIXI.Container {
     this.app = app
     this.scale.set(scale)
     this.manual = manual
+    this.name = "sunny"
 
     const baseTextire = PIXI.Texture.from('sunny')
     this.baseSprite = new PIXI.Sprite(baseTextire)
@@ -40,12 +41,8 @@ export class Sunny extends PIXI.Container {
     // 8 hairs
     const hairSprites = []
     for (let i = 0; i < 8; i++) {
-      const hairSprite = PIXI.Sprite.from(`sunnyHair${i + 1}`)
-      hairSprite.name = `sunnyHair${i + 1}`
-      hairSprite.x = 20 * this.scale.x
-      hairSprite.y = 150 * this.scale.y
-      hairSprite.visible = true
-      hairSprites.push(hairSprite)
+      const hair = new Hair(`sunnyHair${i + 1}`, this.scale.x)
+      hairSprites.push(hair)
     }
     this.hairSprites = hairSprites
     this.addChild(...hairSprites)
@@ -82,11 +79,85 @@ export class Sunny extends PIXI.Container {
     })
   }
 
+  setDown(isDown:boolean){
+    this.hairSprites.forEach((hair) => {
+      hair.isDown = isDown
+      hair.isUp = false
+    })
+  }
+
+  setUp(isUp:boolean){
+    this.hairSprites.forEach((hair) => {
+      hair.isUp = isUp
+      hair.isDown = false
+    })
+  }
+
   removeFlowers () {
     this.armSprite.texture = PIXI.Texture.from('sunnyArmFree')
   }
 
   reset () {
     this.armSprite.texture = PIXI.Texture.from('sunnyArm')
+    this.hairSprites.forEach((hair) => {
+      hair.rotation = 0
+    })
+  }
+
+  hairBound(){
+    console.log('hairBound')
+    this.hairSprites.forEach((hair) => {
+      hair.bound()
+    })
+  }
+}
+
+class Hair extends PIXI.Sprite {
+  maxDegree: number = Common.randomNumber(25, 40)
+  defaultDegree:number = Common.randomNumber(0,10)
+  isDown = false
+  isUp = false
+  ticker = new PIXI.Ticker()
+  constructor (srcName: string, parentScale: number = 1) {
+    const texture = PIXI.Texture.from(srcName)
+    super(texture)
+    this.x = 700 * parentScale
+    this.y = (235 + Common.randomNumber(0,10) )* parentScale
+    this.anchor.set(1, 0)
+    this.visible = true
+
+    // TODO hair animations
+    let downDegree = 0
+    this.ticker.add(() => {
+    if(this.isDown){
+        console.log("down anim")
+        downDegree += 1
+        if(Common.rad2deg(this.rotation) < this.maxDegree){        
+          this.rotation = Common.deg2rad(downDegree)
+        }else{
+          downDegree = 0 // reset
+        }
+      }else if(this.isUp){
+        // TODO
+      }
+    })
+    this.ticker.start()
+  }
+
+  async bound(): Promise<void>{
+    console.log("ぴょん")
+    
+    return new Promise<void>((resolve) => {
+      const ticker = new PIXI.Ticker()
+      ticker.add(() => {
+        if(this.rotation > Common.deg2rad(this.defaultDegree)){
+          this.rotation -= Common.deg2rad(1)
+        }else{
+          resolve()
+          ticker.destroy()
+        }
+      })
+      ticker.start()
+    })
   }
 }

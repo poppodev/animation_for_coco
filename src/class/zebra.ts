@@ -41,12 +41,7 @@ export class Zebra extends PIXI.Container {
     this.addChild(this.smileSprite)
 
     // position
-    if (this.manual) {
-      this.x = this.app.renderer.width - this.width
-    } else {
-      this.x = this.app.renderer.width
-    }
-    this.y = this.app.renderer.height - 410
+    this.reset()
 
     // animation loop
     this.app.ticker.add(() => {
@@ -96,6 +91,16 @@ export class Zebra extends PIXI.Container {
     this.addChild(this.walkSprite)
   }
 
+  reset () {
+    this.y = this.app.renderer.height - 410
+    this.baseSprite.visible = true
+    if (this.manual) {
+      this.x = this.app.renderer.width - this.width
+    } else {
+      this.x = this.app.renderer.width
+    }
+  }
+
   smile () {
     this.smileSprite.visible = !this.smileSprite.visible
     if (this.isWalking) {
@@ -103,7 +108,7 @@ export class Zebra extends PIXI.Container {
     }
   }
 
-  popper () {
+  async takePopper (): Promise<void> {
     this.stop()
     this.isWalking = false
     this.children.forEach((child) => {
@@ -111,6 +116,15 @@ export class Zebra extends PIXI.Container {
     })
     this.popperSprite.visible = true
     this.popperSprite.gotoAndPlay(0)
+    await new Promise<void>((resolve) => {
+      this.popperSprite.onComplete = () => {
+        resolve()
+      }
+    })
+  }
+
+  async doPopper (): Promise<void> {
+    console.log('ぱん！')
     // TODO 紙吹雪
   }
 
@@ -128,5 +142,21 @@ export class Zebra extends PIXI.Container {
       child.visible = false
     })
     this.baseSprite.visible = true
+  }
+
+  async walkTo (stopPointX: number): Promise<void> {
+    this.walk()
+    const ticker = new PIXI.Ticker()
+    await new Promise<void>((resolve) => {
+      ticker.add(() => {
+        if (this.x < stopPointX) {
+          console.log('stop')
+          this.stop()
+          ticker.destroy()
+          resolve()
+        }
+      })
+      ticker.start()
+    })
   }
 }

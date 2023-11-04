@@ -6,7 +6,7 @@ import { Toriko } from './class/toriko'
 import { Sunny } from './class/sunny'
 import { Queen } from './class/queen'
 import { Zebra } from './class/zebra'
-import './styles/index.css';
+import './styles/index.css'
 
 const app = new PIXI.Application({
   width: 1050,
@@ -179,7 +179,7 @@ async function setUp () {
   })
   document.getElementById('popperZebra')!.addEventListener('click', function () {
     if (app.stage.children.includes(zebra)) {
-      zebra.popper()
+      zebra.takePopper()
     }
   })
   document.getElementById('walkZebra')!.addEventListener('click', function () {

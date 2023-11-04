@@ -6,7 +6,7 @@ import { Toriko } from './class/toriko'
 import { Sunny } from './class/sunny'
 import { Queen } from './class/queen'
 import { Zebra } from './class/zebra'
-import './styles/index.css';
+import './styles/index.css'
 
 const app = new PIXI.Application({
   width: 1050,
@@ -53,15 +53,16 @@ async function setUp () {
   app.stage.addChild(zebra)
 
   // coco appear
-  coco.walkTo(initialX).then(() => {
-    setOnEvent(false)
-  })
-  // coco.runTo(0).then(() => {
+  // coco.walkTo(initialX).then(() => {
   //   setOnEvent(false)
   // })
+  coco.runTo(0).then(() => {
+    setOnEvent(false)
+  })
 
+  // TODO 全部完成したら functions を復活させる
   // const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]; TODO
-  const functions = [sunnyAppear]
+  const functions = [zebraAppear]
   const calledFunctions = new Set()
   document.getElementById('HBD')!.addEventListener('click', function () {
     if (onEvent) {
@@ -282,10 +283,10 @@ async function setUp () {
     async function awayAndInitialCoco (): Promise<void> {
       console.log('awayAndInitialCoco')
       await new Promise<void>(async (resolve): Promise<void> => {
-        setTimeout(() => {coco.smile()}, 1000)
+        setTimeout(() => { coco.smile() }, 1000)
         await coco.walkTo(0 - coco.width)
         await coco.turn()
-        await coco.walkTo(app.renderer.width-initialX + coco.width)
+        await coco.walkTo(app.renderer.width - initialX + coco.width)
         resolve()
       })
     }
@@ -306,8 +307,55 @@ async function setUp () {
     }
   }
 
-  function zebraAppear () {
-    console.log('zebra!')
-    // TODO
+  async function zebraAppear () {
+    setOnEvent(true)
+    // TODO ajust coco initial position
+
+    // appear from right
+    zebra.reset()
+    zebra.walk()
+    await Common.sleep(1000)
+    coco.reaction()
+    if (coco.orirentation === 'left') {
+      await coco.turn()
+      await Common.sleep(500)
+    }
+    coco.walk()
+
+    const ticker = new PIXI.Ticker()
+    ticker.add(async () => {
+      if (zebra.x - coco.width / 3 < coco.x) {
+        console.log('meet')
+        ticker.stop()
+        zebra.stop()
+        coco.stop()
+
+        coco.faceUp()
+        await zebra.takePopper()
+
+        await Common.sleep(1000)
+        coco.surprised()
+        await zebra.doPopper()
+
+        await Common.sleep(1000)
+        await zebra.smile()
+        await coco.smile()
+
+        // zebra away
+        zebra.walk()
+        await Common.sleep(1000)
+        await coco.turn()
+        coco.smile()
+
+        zebra.walkTo(-zebra.width).then(() => {
+          setOnEvent(false)
+          coco.smile(false)
+          zebra.reset()
+        })
+
+        ticker.destroy()
+      }
+    })
+    ticker.start()
   }
 }

@@ -15,7 +15,7 @@ export class Sunny extends PIXI.Container {
     this.app = app
     this.scale.set(scale)
     this.manual = manual
-    this.name = "sunny"
+    this.name = 'sunny'
 
     const baseTextire = PIXI.Texture.from('sunny')
     this.baseSprite = new PIXI.Sprite(baseTextire)
@@ -62,7 +62,7 @@ export class Sunny extends PIXI.Container {
 
   async givePresent (on: boolean = true) {
     const stopAngle = -60
-    if(this.armSprite.rotation < 0){
+    if (this.armSprite.rotation < 0) {
       on = false
     }
 
@@ -70,27 +70,30 @@ export class Sunny extends PIXI.Container {
       const fromDegree = Common.rad2deg(hair.rotation)
       const toDegree = fromDegree + Common.randomNumber(8, 12)
       hair.flutter(fromDegree, toDegree)
-      .then(() => {hair.flutter(toDegree, fromDegree)
-        .then(() => {hair.flutter(fromDegree, toDegree)
-          .then(() => {hair.flutter(toDegree, fromDegree)})})
-      })
+        .then(() => {
+          hair.flutter(toDegree, fromDegree)
+            .then(() => {
+              hair.flutter(fromDegree, toDegree)
+                .then(() => { hair.flutter(toDegree, fromDegree) })
+            })
+        })
     })
 
     new Promise<void>((resolve) => {
       const ticker = new PIXI.Ticker()
       ticker.add(() => {
-        if(on){
-          if(this.armSprite.rotation < Common.deg2rad(stopAngle)){
+        if (on) {
+          if (this.armSprite.rotation < Common.deg2rad(stopAngle)) {
             resolve()
             ticker.destroy()
-          }else{
+          } else {
             this.armSprite.rotation -= Common.deg2rad(2)
           }
-        }else{
-          if(this.armSprite.rotation > Common.deg2rad(0)){
+        } else {
+          if (this.armSprite.rotation > Common.deg2rad(0)) {
             resolve()
             ticker.destroy()
-          }else{
+          } else {
             this.armSprite.rotation += Common.deg2rad(2)
           }
         }
@@ -99,14 +102,14 @@ export class Sunny extends PIXI.Container {
     })
   }
 
-  setDown(isDown:boolean){
+  setDown (isDown: boolean) {
     this.hairSprites.forEach((hair) => {
       hair.isDown = isDown
       hair.isUp = false
     })
   }
 
-  setUp(isUp:boolean){
+  setUp (isUp: boolean) {
     this.hairSprites.forEach((hair) => {
       hair.isUp = isUp
       hair.isDown = false
@@ -124,16 +127,16 @@ export class Sunny extends PIXI.Container {
     })
   }
 
-  hairBound(){
+  hairBound () {
     console.log('hairBound')
     this.hairSprites.forEach((hair) => {
-      setTimeout(() => hair.bound(), Common.randomNumber(0,100))
+      setTimeout(async () => { await hair.bound() }, Common.randomNumber(0, 100))
     })
   }
 }
 
 class Hair extends PIXI.Sprite {
-  defaultDegree:number = Common.randomNumber(0,9)
+  defaultDegree: number = Common.randomNumber(0, 9)
   maxDegree: number = 60
   isDown = false
   isUp = false
@@ -142,7 +145,7 @@ class Hair extends PIXI.Sprite {
     const texture = PIXI.Texture.from(srcName)
     super(texture)
     this.x = 700 * parentScale
-    this.y = (235 + Common.randomNumber(0,10) )* parentScale
+    this.y = (235 + Common.randomNumber(0, 10)) * parentScale
     this.anchor.set(1, 0)
     this.visible = true
 
@@ -152,22 +155,22 @@ class Hair extends PIXI.Sprite {
     const flutterMax = Common.randomNumber(10, 15)
     const flutterMin = -Common.randomNumber(10, 15)
 
-    ticker.add(() => {   
-      if(this.isDown || this.isUp){
-        const baseRotate = (this.isDown)? Common.deg2rad(this.maxDegree):Common.deg2rad(this.defaultDegree)
-        if(isPlus){
-          if(rotate > flutterMax){
+    ticker.add(() => {
+      if (this.isDown || this.isUp) {
+        const baseRotate = (this.isDown) ? Common.deg2rad(this.maxDegree) : Common.deg2rad(this.defaultDegree)
+        if (isPlus) {
+          if (rotate > flutterMax) {
             isPlus = false
           }
           rotate += 0.7
-        }else{
-          if(rotate < flutterMin){
+        } else {
+          if (rotate < flutterMin) {
             isPlus = true
           }
           rotate -= 0.7
         }
         this.rotation = baseRotate + Common.deg2rad(rotate)
-      }else{
+      } else {
         rotate = 0
         isPlus = false
       }
@@ -175,28 +178,28 @@ class Hair extends PIXI.Sprite {
     ticker.start()
   }
 
-  async bound(): Promise<void>{
-    await this._bound(Common.rad2deg(this.rotation), this.maxDegree * 2/3)
-    await this.flutter(this.maxDegree*2/3,this.defaultDegree-10)
-    await this.flutter(this.defaultDegree-10, this.maxDegree/4)
-    await this.flutter(this.maxDegree/4, this.defaultDegree-5, 0.5)
-    await this.flutter(this.defaultDegree-5, this.defaultDegree, 0.5)
+  async bound (): Promise<void> {
+    await this._bound(Common.rad2deg(this.rotation), this.maxDegree * 2 / 3)
+    await this.flutter(this.maxDegree * 2 / 3, this.defaultDegree - 10)
+    await this.flutter(this.defaultDegree - 10, this.maxDegree / 4)
+    await this.flutter(this.maxDegree / 4, this.defaultDegree - 5, 0.5)
+    await this.flutter(this.defaultDegree - 5, this.defaultDegree, 0.5)
   }
-  
-  async flutter(startDegree:number,stopDegree:number,speed:number=1): Promise<void>{
-    return new Promise<void>((resolve) => {
+
+  async flutter (startDegree: number, stopDegree: number, speed: number = 1): Promise<void> {
+    await new Promise<void>((resolve) => {
       const ticker = new PIXI.Ticker()
       let degree = startDegree
       ticker.add(() => {
-        if(startDegree > stopDegree ){
-          degree -= 1*speed
-          if(degree < stopDegree ){
+        if (startDegree > stopDegree) {
+          degree -= 1 * speed
+          if (degree < stopDegree) {
             resolve()
             ticker.destroy()
           }
-        }else{
-          degree += 1*speed
-          if(degree > stopDegree ){
+        } else {
+          degree += 1 * speed
+          if (degree > stopDegree) {
             resolve()
             ticker.destroy()
           }
@@ -207,28 +210,28 @@ class Hair extends PIXI.Sprite {
     })
   }
 
-  private async _bound(startDegree:number,stopDegree:number): Promise<void>{    
-    return new Promise<void>((resolve) => {
+  private async _bound (startDegree: number, stopDegree: number): Promise<void> {
+    await new Promise<void>((resolve) => {
       const ticker = new PIXI.Ticker()
       let degree = startDegree
       let touched = false
       let frame = 0
       ticker.add(() => {
-        if(touched){
-          //back
-          if(degree > stopDegree ){
+        if (touched) {
+          // back
+          if (degree > stopDegree) {
             resolve()
             ticker.destroy()
-          }else{
+          } else {
             frame -= 0.7
             degree += Math.abs(frame * 0.1)
             this.rotation = Common.deg2rad(degree)
           }
-        }else{
+        } else {
           // go
-          if(degree <= this.defaultDegree){
+          if (degree <= this.defaultDegree) {
             touched = true
-          }else{
+          } else {
             frame += 0.8
             degree -= frame * 0.11
             this.rotation = Common.deg2rad(degree)

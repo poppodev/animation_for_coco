@@ -33,6 +33,7 @@ export class Coco extends PIXI.Container {
   private downSmileSprite!: AnimatedSprite
   private removeCoverSprite!: PIXI.AnimatedSprite
   private appendCoverSprite!: PIXI.AnimatedSprite
+  private reactionSprite!: PIXI.Sprite
   private readonly turnMargin = 50
 
   constructor (app: PIXI.Application, scale: number = 0.5, manual: boolean = false) {
@@ -77,15 +78,13 @@ export class Coco extends PIXI.Container {
     // parts sprites
     this.setPatchSprites()
 
+    // reation
+    this.setReactionSprite()
+
     // animation loop
     this.app.ticker.add(() => {
       // turn
       if (this.manual) {
-        // const isTurn = (this.isWalking || this.isRunning) &&
-        // (
-        //   ((this.orirentation === 'left') && (this.x + this.width * scale < 0 + this.turnMargin * scale)) ||
-        //   ((this.orirentation === 'right') && (this.x + this.width * scale > this.app.renderer.width - this.turnMargin * scale))
-        // )
         const originallyRunning = this.isRunning
         const originallyWalking = this.isWalking
         if ((this.isWalking || this.isRunning) && this.isReachEdge()) {
@@ -389,6 +388,13 @@ export class Coco extends PIXI.Container {
     this.addChild(this.surpriseSprite)
   }
 
+  private setReactionSprite () {
+    this.reactionSprite = new PIXI.Sprite(PIXI.Texture.from('popup'))
+    this.reactionSprite.visible = false
+    this.reactionSprite.y = -150
+    this.addChild(this.reactionSprite)
+  }
+
   walk () {
     this.onMoving = true
     this.isWalking = true
@@ -397,6 +403,7 @@ export class Coco extends PIXI.Container {
     this.children.forEach((child) => {
       child.visible = false
     })
+    this.reactionSprite.visible = this.hasReaction
     this.walkSprite.gotoAndPlay(0)
     this.walkSprite.visible = true
     this.eyeBlinkSprite.visible = true
@@ -447,6 +454,7 @@ export class Coco extends PIXI.Container {
     this.children.forEach((child) => {
       child.visible = false
     })
+    this.reactionSprite.visible = this.hasReaction
     this.runSprite.visible = true
     this.runSprite.gotoAndPlay(0)
     this.reverseRunPatchSprite.gotoAndPlay(0)
@@ -462,6 +470,7 @@ export class Coco extends PIXI.Container {
     })
     this.reverseWalkPatchSprite.visible = this.orirentation === 'right'
     this.baseSprite.visible = true
+    this.reactionSprite.visible = this.hasReaction
   }
 
   async down (): Promise<void> {
@@ -476,6 +485,7 @@ export class Coco extends PIXI.Container {
       this.reverseDownPatchSprite.visible = true
     }
     this.downSprite.visible = true
+    this.reactionSprite.visible = this.hasReaction
     this.downSprite.gotoAndPlay(0)
     this.reverseDownPatchSprite.gotoAndPlay(0)
     await new Promise<void>((resolve) => {
@@ -515,6 +525,7 @@ export class Coco extends PIXI.Container {
       child.visible = false
     })
     this.turnLeftSprite.visible = true
+    this.reactionSprite.visible = this.hasReaction
     this.turnLeftSprite.gotoAndPlay(0)
     if (this.orirentation === 'right') {
       this.reverseTurnPatchSprite.visible = true
@@ -552,28 +563,35 @@ export class Coco extends PIXI.Container {
     }
   }
 
-  async smile () {
+  async smile (on: boolean = true) {
+    this.surpriseSprite.visible = false
     await new Promise<void>((resolve) => {
-      if (this.isDown) {
-        this.smileSprite.visible = false
-        this.downSmileSprite.visible = true
-        this.downSmileSprite.gotoAndPlay(0)
-        this.downSmileSprite.onComplete = () => {
+      if (on) {
+        if (this.isDown) {
+          this.smileSprite.visible = false
+          this.downSmileSprite.visible = true
+          this.downSmileSprite.gotoAndPlay(0)
+          this.downSmileSprite.onComplete = () => {
+            resolve()
+          }
+        } else if (this.baseSprite.visible || this.walkSprite.visible) {
+          this.smileSprite.visible = true
+          this.smileSprite.rotation = 0
+          this.smileSprite.x = 0
+          this.smileSprite.y = 0
+          resolve()
+        } else if (this.faceUpSprite.visible) {
+          this.smileSprite.visible = true
+          this.smileSprite.rotation = Common.deg2rad(12)
+          this.smileSprite.x = 49
+          this.smileSprite.y = -88
+          resolve()
+        } else {
           resolve()
         }
-      } else if (this.baseSprite.visible || this.walkSprite.visible) {
-        this.smileSprite.visible = true
-        this.smileSprite.rotation = 0
-        this.smileSprite.x = 0
-        this.smileSprite.y = 0
-        resolve()
-      } else if (this.faceUpSprite.visible) {
-        this.smileSprite.visible = true
-        this.smileSprite.rotation = Common.deg2rad(12)
-        this.smileSprite.x = 49
-        this.smileSprite.y = -88
-        resolve()
       } else {
+        this.smileSprite.visible = false
+        this.downSmileSprite.visible = false
         resolve()
       }
     })
@@ -595,6 +613,8 @@ export class Coco extends PIXI.Container {
   }
 
   surprised () {
+    this.smileSprite.visible = false
+    this.downSmileSprite.visible = false
     if (this.isRunning) {
       this.stop()
     }
@@ -602,6 +622,11 @@ export class Coco extends PIXI.Container {
     if (this.isDown) {
       this.surpriseSprite.x = -20
       this.surpriseSprite.y = 100
+    } else if (this.faceUpSprite.visible) {
+      this.surpriseSprite.visible = true
+      this.surpriseSprite.rotation = Common.deg2rad(12)
+      this.surpriseSprite.x = 49
+      this.surpriseSprite.y = -88
     } else {
       this.surpriseSprite.y = 0
       this.surpriseSprite.x = 0
@@ -659,24 +684,24 @@ export class Coco extends PIXI.Container {
   }
 
   async reaction (): Promise<void> {
+    console.log('reaction')
     this.hasReaction = true
-    const messageSprite = new PIXI.Sprite(PIXI.Texture.from('popup'))
-    messageSprite.visible = true
+    this.reactionSprite.visible = true
     const direction = this.orirentation === 'left' ? 1 : -1
-    messageSprite.x = direction * this.width + 20
-    messageSprite.y = -150
-    this.addChild(messageSprite)
+    this.reactionSprite.x = direction * this.width + 20
+
     const messageTicker = new PIXI.Ticker()
     let waitCount = 40
     await new Promise<void>((resolve) => {
       messageTicker.add(() => {
         waitCount -= 1
-        if (messageSprite.alpha > 0 && waitCount <= 0) {
-          messageSprite.alpha -= 0.05
-          messageSprite.y -= 2
+        if (this.reactionSprite.alpha > 0 && waitCount <= 0) {
+          this.reactionSprite.alpha -= 0.05
+          this.reactionSprite.y -= 2
         }
-        if (messageSprite.alpha <= 0) {
+        if (this.reactionSprite.alpha <= 0) {
           messageTicker.destroy()
+          this.hasReaction = false
           resolve()
         }
       })
@@ -689,7 +714,7 @@ export class Coco extends PIXI.Container {
     this.walkSprite.animationSpeed = _walkSpeed / 60
   }
 
-  async getFlower(): Promise<void> {
+  async getFlower (): Promise<void> {
     // TODO
     await Common.sleep(2000)
   }

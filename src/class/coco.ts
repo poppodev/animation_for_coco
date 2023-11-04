@@ -684,6 +684,7 @@ export class Coco extends PIXI.Container {
   }
 
   async reaction (): Promise<void> {
+    // TODO ２回目以降出ていないかも
     console.log('reaction')
     this.hasReaction = true
     this.reactionSprite.visible = true

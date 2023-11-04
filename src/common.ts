@@ -192,3 +192,7 @@ export function rad2deg (radian: number) {
 export function randomNumber (from: number, to: number): number {
   return Math.floor(Math.random() * (to - from + 1)) + from
 }
+
+export function randomTrueOrFalse (percentage: number): boolean {
+  return Math.random() * 100 < percentage
+}

@@ -53,16 +53,11 @@ async function setUp () {
   app.stage.addChild(zebra)
 
   // coco appear
-  // coco.walkTo(initialX).then(() => {
-  //   setOnEvent(false)
-  // })
-  coco.runTo(0).then(() => {
+  coco.walkTo(initialX).then(() => {
     setOnEvent(false)
   })
 
-  // TODO 全部完成したら functions を復活させる
-  // const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]; TODO
-  const functions = [zebraAppear]
+  const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]
   const calledFunctions = new Set()
   document.getElementById('HBD')!.addEventListener('click', function () {
     if (onEvent) {
@@ -129,7 +124,8 @@ async function setUp () {
   }
 
   function komatsuAppear () {
-    // TODO cocoの初期値によって開始位置調整が必要？
+    // TODO cocoの初期値によって開始位置調整が必要
+    // TODO ラストコールの時にticker系でエラーが出ている？画面左端にいたせいかも？
     setOnEvent(true)
 
     // ajust orientation
@@ -184,7 +180,7 @@ async function setUp () {
         await coco.turn()
         coco.setWalkSpeed(komatsu.walkSpeed)
         await Common.sleep(1200)
-        await coco.walkTo(app.renderer.width + Math.abs(coco.width))
+        await coco.walkTo(app.renderer.width)
 
         // back to initial position
         await coco.turn()
@@ -200,7 +196,6 @@ async function setUp () {
 
   async function torikoAppear () {
     // TODO cocoにgetPresentを追加してから完成
-    console.log('toriko!')
     setOnEvent(true)
 
     // ajust coco start position
@@ -213,16 +208,16 @@ async function setUp () {
     toriko.reset()
     toriko.walk()
     await Common.sleep(1000)
-    await coco.reaction()
+    coco.reaction()
     if (coco.orirentation === 'left') {
       await coco.turn()
+      await Common.sleep(300)
     }
     coco.walk()
 
     const ticker = new PIXI.Ticker()
     ticker.add(async () => {
       if (toriko.x - coco.width / 2 < coco.x) {
-        console.log('meet')
         ticker.stop()
         toriko.stop()
         coco.stop()
@@ -240,7 +235,7 @@ async function setUp () {
         await Common.sleep(2000)
         await coco.turn()
 
-        await coco.walkTo(app.renderer.width + Math.abs(coco.width))
+        await coco.walkTo(app.renderer.width)
 
         // back to initial position
         await coco.turn()
@@ -259,6 +254,8 @@ async function setUp () {
     setOnEvent(true)
 
     const startPointX = initialX - 160
+
+    // TODO queen のshadow固定
 
     await Promise.all([comeCoco(), queen.appear()])
 
@@ -281,7 +278,6 @@ async function setUp () {
 
     // functions..
     async function awayAndInitialCoco (): Promise<void> {
-      console.log('awayAndInitialCoco')
       await new Promise<void>(async (resolve): Promise<void> => {
         setTimeout(() => { coco.smile() }, 1000)
         await coco.walkTo(0 - coco.width)
@@ -292,7 +288,6 @@ async function setUp () {
     }
     // move coco to start point
     async function comeCoco (): Promise<void> {
-      console.log('comeCoco')
       await new Promise<void>(async (resolve): Promise<void> => {
         if (coco.x < startPointX && coco.orirentation === 'left' ||
         coco.x > startPointX && coco.orirentation === 'right') {
@@ -324,22 +319,22 @@ async function setUp () {
 
     const ticker = new PIXI.Ticker()
     ticker.add(async () => {
-      if (zebra.x - coco.width / 3 < coco.x) {
-        console.log('meet')
+      if (zebra.x - coco.width / 4 < coco.x) {
         ticker.stop()
         zebra.stop()
         coco.stop()
 
-        coco.faceUp()
+        Common.sleep(500).then(async () => { coco.faceUp() })
         await zebra.takePopper()
-
-        await Common.sleep(1000)
+        await Common.sleep(300)
+        zebra.doPopper()
+        await Common.sleep(100)
         coco.surprised()
-        await zebra.doPopper()
-
-        await Common.sleep(1000)
-        await zebra.smile()
+        await Common.sleep(1500)
+        zebra.smile()
+        await Common.sleep(1500)
         await coco.smile()
+        await Common.sleep(1500)
 
         // zebra away
         zebra.walk()

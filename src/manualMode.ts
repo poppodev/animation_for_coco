@@ -177,9 +177,11 @@ async function setUp () {
       zebra.smile()
     }
   })
-  document.getElementById('popperZebra')!.addEventListener('click', function () {
+  document.getElementById('popperZebra')!.addEventListener('click', async function () {
     if (app.stage.children.includes(zebra)) {
-      zebra.takePopper()
+      await zebra.takePopper()
+      await Common.sleep(500)
+      zebra.doPopper()
     }
   })
   document.getElementById('walkZebra')!.addEventListener('click', function () {

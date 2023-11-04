@@ -1,4 +1,6 @@
 import * as PIXI from 'pixi.js'
+import * as Common from '../common'
+import { GlowFilter } from '@pixi/filter-glow'
 
 export class Zebra extends PIXI.Container {
   app: PIXI.Application
@@ -6,6 +8,8 @@ export class Zebra extends PIXI.Container {
   private walkSprite!: PIXI.AnimatedSprite
   private readonly smileSprite!: PIXI.Sprite
   private popperSprite!: PIXI.AnimatedSprite
+  private popperPullSprite!: PIXI.Sprite
+  paperPiecesContainer = new PIXI.Container()
   manual: boolean = false
   isWalking: boolean = false
 
@@ -40,13 +44,22 @@ export class Zebra extends PIXI.Container {
     this.smileSprite.visible = false
     this.addChild(this.smileSprite)
 
+    // paperPiecesContainer
+    this.addChild(this.paperPiecesContainer)
+
     // position
     this.reset()
 
     // animation loop
     this.app.ticker.add(() => {
-      if (this.isWalking) {
-        this.x += -6 * scale
+      if (this.x + this.width < 0) {
+        if (this.manual) {
+          this.x = app.renderer.width
+        } else {
+          this.stop()
+        }
+      } else if (this.isWalking) {
+        this.x -= 6 * scale
       }
     })
   }
@@ -60,6 +73,12 @@ export class Zebra extends PIXI.Container {
     this.popperSprite.animationSpeed = 0.15
     this.popperSprite.visible = false
     this.addChild(this.popperSprite)
+
+    // doPopper
+    this.popperPullSprite = PIXI.Sprite.from('zebraPopper9')
+    this.popperPullSprite.name = 'zebraPopperPull'
+    this.popperPullSprite.visible = false
+    this.addChild(this.popperPullSprite)
 
     // shadow
     const shadowGraphics = new PIXI.Graphics()
@@ -87,6 +106,16 @@ export class Zebra extends PIXI.Container {
     this.walkSprite.loop = true
     this.walkSprite.animationSpeed = 0.1
     this.walkSprite.visible = false
+
+    // shadow
+    const shadowGraphics = new PIXI.Graphics()
+    shadowGraphics.beginFill(0x000000, 0.15)
+    shadowGraphics.drawEllipse(0, 0, 220, 20)
+    shadowGraphics.endFill()
+    shadowGraphics.x = 320
+    shadowGraphics.y = this.baseSprite.height - 30
+    this.walkSprite.addChildAt(shadowGraphics, 0)
+
     this.walkSprite.play()
     this.addChild(this.walkSprite)
   }
@@ -124,8 +153,53 @@ export class Zebra extends PIXI.Container {
   }
 
   async doPopper (): Promise<void> {
-    console.log('ぱん！')
-    // TODO 紙吹雪
+    this.paperPiecesContainer.removeChildren() // reset
+    this.paperPiecesContainer.visible = true
+
+    this.popperSprite.visible = false
+    this.popperPullSprite.visible = true
+
+    this.bangEffect()
+
+    const pieceNum = 20
+    const pieces = []
+    for (let i = 0; i < pieceNum; i++) {
+      const piece = new PaperPiece()
+      piece.name = `piece${i}`
+      pieces.push(piece)
+    }
+    this.paperPiecesContainer.addChild(...pieces)
+    this.paperPiecesContainer.filters = [new GlowFilter({ innerStrength: 0, outerStrength: 2, color: 0xc2fbff, alpha: 0.7 })]
+
+    const promises = pieces.map(async (piece) => {
+      await piece.reachTop()
+        .then(async () => { await piece.fall() })
+    })
+    await Promise.all(promises)
+  }
+
+  private async bangEffect () {
+    const ticker = new PIXI.Ticker()
+    const panDeleteWaitFrame = 30
+    let frame = 0
+    await new Promise<void>((resolve) => {
+      const panSprite = PIXI.Sprite.from('pan')
+      panSprite.scale.set(0.3)
+      panSprite.y = 150
+      panSprite.x = -50
+      this.addChild(panSprite)
+      ticker.add(() => {
+        frame += 1
+        if (frame >= panDeleteWaitFrame) {
+          panSprite.alpha -= 0.08
+          if (panSprite.alpha <= 0) {
+            resolve()
+            ticker.destroy()
+          }
+        }
+      })
+      ticker.start()
+    })
   }
 
   walk () {
@@ -134,6 +208,7 @@ export class Zebra extends PIXI.Container {
       child.visible = false
     })
     this.walkSprite.visible = true
+    this.paperPiecesContainer.visible = true
   }
 
   stop () {
@@ -150,10 +225,96 @@ export class Zebra extends PIXI.Container {
     await new Promise<void>((resolve) => {
       ticker.add(() => {
         if (this.x < stopPointX) {
-          console.log('stop')
           this.stop()
           ticker.destroy()
           resolve()
+        }
+      })
+      ticker.start()
+    })
+  }
+}
+
+class PaperPiece extends PIXI.Graphics {
+  reachPointX: number = -300 + Common.randomNumber(0, 200)
+  reachPointY: number = 50 + Common.randomNumber(0, 100)
+  fallPointX: number = this.reachPointX + Common.randomNumber(-200, 0)
+  fallPointY: number = 820 + Common.randomNumber(0, 100)
+  size: number = Common.randomNumber(15, 40)
+  isTriangle: boolean = Common.randomTrueOrFalse(30)
+  constructor () {
+    super()
+    if (this.isTriangle) {
+      this.beginFill(0xffffff)
+      this.moveTo(0, 0)
+      this.lineTo(this.size, 0)
+      this.lineTo(this.size / 2, this.size)
+      this.endFill()
+    } else {
+      this.beginFill(0xffffff)
+      this.drawRect(0, 0, this.size, this.size)
+      this.endFill()
+    }
+    this.visible = true
+    this.tint = PaperPiece.randomColor()
+    this.x = 100
+    this.y = 350
+    this.pivot.x = this.size / 2
+    this.pivot.y = this.size / 2
+    this.angle = Common.randomNumber(0, 360)
+  }
+
+  static randomColor (): number {
+    //　red yellow orange pink rightgreen purple white skyblue aqua
+    const colorChoices = [0xff0000, 0xffff00, 0xffa500, 0xffc0cb, 0x00ff7f, 0x800080, 0xffffff, 0x87ceeb, 0x00ffff]
+    return colorChoices[Common.randomNumber(0, colorChoices.length - 1)]
+  }
+
+  async reachTop (): Promise<void> {
+    const ticker = new PIXI.Ticker()
+    await new Promise<void>((resolve) => {
+      ticker.add(() => {
+        this.x += (this.reachPointX - this.x) / 10
+        this.y += (this.reachPointY - this.y) / 10
+        this.angle += 5
+        if (Math.round(this.x) <= this.reachPointX) {
+          this.x = Math.ceil(this.x)
+          ticker.destroy()
+          resolve()
+        }
+      })
+      ticker.start()
+    })
+  }
+
+  async fall (): Promise<void> {
+    const ticker = new PIXI.Ticker()
+    const scaleMultiplier = Common.randomNumber(100, 200) / 100
+    const anglePlus = Common.randomNumber(200, 500) / 100
+    const isScaleChange = Common.randomTrueOrFalse(50)
+
+    await new Promise<void>((resolve) => {
+      let frame = 0
+      ticker.add(() => {
+        frame += 1
+        if (this.y >= this.fallPointY) {
+          this.x = Math.round(this.x)
+          resolve()
+        } else {
+          this.x += (this.fallPointX - this.reachPointX) / 100
+          this.y += 6
+          this.angle += anglePlus
+        }
+
+        if (isScaleChange) {
+          this.scale.x = Math.cos(Common.deg2rad(frame * scaleMultiplier))
+        }
+
+        if (this.y >= this.fallPointY - 100) {
+          this.alpha -= 0.02
+        }
+        if (this.alpha <= 0) {
+          ticker.destroy()
         }
       })
       ticker.start()

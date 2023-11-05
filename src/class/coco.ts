@@ -341,7 +341,7 @@ export class Coco extends PIXI.Container {
     // face up sprite
     this.faceUpSprite = PIXI.Sprite.from('cocoFaceUp')
     this.faceUpSprite.visible = false
-    this.faceUpSprite.addChildAt(this.shadowGraphics(100, this.baseSprite.width / 2, this.baseSprite.height - 30),0)
+    this.faceUpSprite.addChildAt(this.shadowGraphics(100, this.baseSprite.width / 2, this.baseSprite.height - 30), 0)
     this.addChild(this.faceUpSprite)
     this.reverseFaceUpSprite = PIXI.Sprite.from('cocoFaceUpReverse')
     this.reverseFaceUpSprite.visible = false

@@ -242,7 +242,7 @@ class PaperPiece extends PIXI.Graphics {
   fallPointY: number = 820 + Common.randomNumber(0, 100)
   size: number = Common.randomNumber(15, 40)
   isTriangle: boolean = Common.randomTrueOrFalse(30)
-  
+
   constructor () {
     super()
     if (this.isTriangle) {

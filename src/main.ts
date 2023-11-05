@@ -46,7 +46,7 @@ async function setUp () {
   const sunny = new Sunny(app, 0.4)
   queen.addChild(sunny)
   const zebra = new Zebra(app, 0.4)
-  
+
   app.stage.addChild(toriko)
   app.stage.addChild(queen)
   app.stage.addChild(komatsu)
@@ -323,11 +323,10 @@ async function setUp () {
 
   async function zebraAppear () {
     setOnEvent(true)
-    const startX = app.renderer.width * 2/ 5
+    const startX = app.renderer.width * 2 / 5
     if (startX < coco.x) {
       await coco.walkTo(startX)
     }
-
 
     // appear from right
     zebra.reset()

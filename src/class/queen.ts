@@ -25,7 +25,7 @@ export class Queen extends PIXI.Container {
     this.y = -this.height
     this.baseScale = scale
 
-    const shadow = new QueenShadow(this.width*scale)
+    const shadow = new QueenShadow(this.width * scale)
     this.shadow = shadow
     this.shadow.x = 300
     this.shadow.y = this.height
@@ -33,7 +33,7 @@ export class Queen extends PIXI.Container {
     console.log(`shadow.y:${shadow.y},this.y:${this.y}`)
   }
 
-  async appear (fromX: number , fromY: number, stopX: number, stopY: number): Promise<void> {
+  async appear (fromX: number, fromY: number, stopX: number, stopY: number): Promise<void> {
     console.log('appear')
     this.visible = true
     const sunny: Sunny = this.getChildByName('sunny') as Sunny
@@ -61,7 +61,7 @@ export class Queen extends PIXI.Container {
     sunny.setUp(false)
   }
 
-  private async appearDown (fromX: number , fromY: number, stopX: number, stopY: number): Promise<void> {
+  private async appearDown (fromX: number, fromY: number, stopX: number, stopY: number): Promise<void> {
     // start position
     this.x = fromX
     this.y = fromY
@@ -81,10 +81,10 @@ export class Queen extends PIXI.Container {
         if (this.x < stopX) {
           this.x += xStep
           this.y += yStep
-          this.shadow.y = - this.y + this.shadowDiff
+          this.shadow.y = -this.y + this.shadowDiff
         } else {
           //
-          this.shadow.y = - this.y + this.shadowDiff
+          this.shadow.y = -this.y + this.shadowDiff
           resolve()
           appearTicker.destroy()
         }
@@ -99,7 +99,7 @@ export class Queen extends PIXI.Container {
     await new Promise<void>((resolve) => {
       ticker.add(() => {
         this.y += step
-        this.shadow.y = - this.y + this.shadowDiff
+        this.shadow.y = -this.y + this.shadowDiff
         moved += step
         if (Math.abs(moved) >= distance) {
           resolve()
@@ -130,7 +130,7 @@ export class Queen extends PIXI.Container {
         if (this.x < stopPointX) {
           this.x += xStep
           this.y += yStep
-          this.shadow.y = - this.y + this.shadowDiff
+          this.shadow.y = -this.y + this.shadowDiff
         } else {
           resolve()
           appearTicker.destroy()

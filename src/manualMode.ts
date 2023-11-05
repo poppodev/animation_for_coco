@@ -154,7 +154,7 @@ async function setUp () {
         queen.getOut()
       } else {
         queen.appear(fromX, fromY, stopX, stopY)
-        }
+      }
     }
   })
   document.getElementById('smileSunny')!.addEventListener('click', function () {

@@ -70,9 +70,9 @@ async function setUp () {
       resetFunctions()
       availableFunctions = functions.filter(func => !calledFunctions.has(func))
     }
-    // const randomIndex = Math.floor(Math.random() * availableFunctions.length)
+    const randomIndex = Math.floor(Math.random() * availableFunctions.length)
     const selectedFunction = availableFunctions[0]
-    calledFunctions.add(selectedFunction)
+    calledFunctions.add(randomIndex)
     selectedFunction()
   })
 
@@ -129,19 +129,6 @@ async function setUp () {
     }
     if (event.key === 'Shift') {
       shiftDown = false
-    }
-  })
-
-  // TODO delete after
-  let elapsed = 0
-  let count = 0
-  app.ticker.add((delta) => {
-    elapsed += delta
-    if (elapsed >= 60 && count < 10) {
-      const currentFPS = app.ticker.FPS.toFixed(2)
-      console.log(`Current FPS: ${currentFPS},delta: ${delta}`)
-      elapsed = 0
-      count += 1
     }
   })
 

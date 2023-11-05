@@ -58,7 +58,9 @@ async function setUp () {
     setOnEvent(false)
   })
 
-  const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]
+  // TODO 検証中
+  // const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]
+  const functions = [torikoAppear]
   const calledFunctions = new Set()
   document.getElementById('HBD')!.addEventListener('click', function () {
     if (onEvent) {
@@ -75,7 +77,8 @@ async function setUp () {
     selectedFunction()
   })
 
-  // key triggers  TODO keytrigger管理をもうちょっときれいにしたい
+  // key triggers
+  // TODO keytrigger管理をもうちょっときれいにしたい
   let shiftDown = false
   document.addEventListener('keydown', async (event) => {
     const targetKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Shift']
@@ -278,11 +281,13 @@ async function setUp () {
     await Common.sleep(1500)
     sunny.smile()
     await sunny.givePresent(true)
-    await Common.sleep(2000)
+    await Common.sleep(1000)
     coco.smile()
+    await Common.sleep(500)
 
+    await coco.getFlowerBefore()
     sunny.removeFlowers()
-    await coco.getFlower()
+    await coco.getFlowerAfter()
     await sunny.givePresent(false)
 
     await Common.sleep(1000)
@@ -296,6 +301,7 @@ async function setUp () {
       await new Promise<void>(async (resolve): Promise<void> => {
         setTimeout(() => { coco.smile() }, 1000)
         await coco.walkTo(0 - coco.width)
+        coco.hasFlower = false
         await coco.turn()
         await coco.walkTo(app.renderer.width - initialX + coco.width)
         resolve()

@@ -9,6 +9,7 @@ export class Coco extends PIXI.Container {
   isRunning: boolean = false
   isDown: boolean = false
   hasReaction: boolean = false
+  hasFlower: boolean = false
   manual: boolean = false
   onMoving: boolean = false
   orirentation: 'left' | 'right' = 'left'
@@ -20,6 +21,7 @@ export class Coco extends PIXI.Container {
   private reverseFaceUpSprite!: PIXI.Sprite
   private surpriseSprite!: PIXI.Sprite
   private smileSprite!: PIXI.Sprite
+  private hasFlowerSprite!: PIXI.Sprite
   private walkSprite!: AnimatedSprite
   private runSprite!: AnimatedSprite
   private downSprite!: AnimatedSprite
@@ -33,6 +35,9 @@ export class Coco extends PIXI.Container {
   private downSmileSprite!: AnimatedSprite
   private removeCoverSprite!: PIXI.AnimatedSprite
   private appendCoverSprite!: PIXI.AnimatedSprite
+  private getFlowerSpriteBefore!: PIXI.AnimatedSprite
+  private getFlowerSpriteAfter!: PIXI.AnimatedSprite
+  private walkFlowerPatchSprite!: PIXI.AnimatedSprite
   private reactionSprite!: PIXI.Sprite
   private readonly turnMargin = 50
 
@@ -53,7 +58,6 @@ export class Coco extends PIXI.Container {
       this.x = this.app.renderer.width / 2
     } else {
       this.x = this.app.renderer.width
-      0
     }
     this.y = this.app.renderer.height - 350
 
@@ -68,6 +72,9 @@ export class Coco extends PIXI.Container {
 
     // reation
     this.setReactionSprite()
+
+    // git sprite
+    this.setGetFlowerSprite()
 
     // animation loop
     this.app.ticker.add(() => {
@@ -127,14 +134,26 @@ export class Coco extends PIXI.Container {
     this.walkSprite = new AnimatedSprite(walkTextures)
     this.walkSprite.visible = false
     this.walkSprite.animationSpeed = 0.1
-    this.walkSprite.play()
     this.walkSprite.name = 'cocoWalk'
+
+    const srcWalkFlower = ['cocoWalkFlowerPatch1', 'cocoWalkFlowerPatch2', 'cocoWalkFlowerPatch3', 'cocoWalkFlowerPatch4',
+      'cocoWalkFlowerPatch5', 'cocoWalkFlowerPatch6', 'cocoWalkFlowerPatch7', 'cocoWalkFlowerPatch8']
+    const walkFlowerTextures = srcWalkFlower.map(src => PIXI.Texture.from(src))
+    this.walkFlowerPatchSprite = new AnimatedSprite(walkFlowerTextures)
+    this.walkFlowerPatchSprite.animationSpeed = 0.1
+    this.walkFlowerPatchSprite.name = 'walkFlowerPatch'
+    this.walkFlowerPatchSprite.loop = true
+    this.walkFlowerPatchSprite.visible = false
+
+    this.walkFlowerPatchSprite.play()
+    this.walkSprite.play()
 
     // shadow
     const shadowGraphics = this.shadowGraphics(170, this.baseSprite.width / 2 + 20, this.baseSprite.height - 30)
     this.walkSprite.addChildAt(shadowGraphics, 0)
 
     this.addChild(this.walkSprite)
+    this.addChild(this.walkFlowerPatchSprite)
   }
 
   private setRunSprite () {
@@ -368,6 +387,32 @@ export class Coco extends PIXI.Container {
     this.addChild(this.reactionSprite)
   }
 
+  private setGetFlowerSprite () {
+    const srcGetFlowerBefore = ['cocoGetFlower1', 'cocoGetFlower3', 'cocoGetFlower4']
+    const getFlowerTexturesBefore = srcGetFlowerBefore.map(src => PIXI.Texture.from(src))
+    this.getFlowerSpriteBefore = new AnimatedSprite(getFlowerTexturesBefore)
+    this.getFlowerSpriteBefore.animationSpeed = 0.1
+    this.getFlowerSpriteBefore.name = 'getFlower'
+    this.getFlowerSpriteBefore.loop = false
+    this.getFlowerSpriteBefore.visible = false
+    this.getFlowerSpriteBefore.y = -50
+    this.addChild(this.getFlowerSpriteBefore)
+
+    const srcGetFlowerAfter = ['cocoGetFlower5', 'cocoGetFlower6']
+    const getFlowerTexturesAfter = srcGetFlowerAfter.map(src => PIXI.Texture.from(src))
+    this.getFlowerSpriteAfter = new AnimatedSprite(getFlowerTexturesAfter)
+    this.getFlowerSpriteAfter.animationSpeed = 0.1
+    this.getFlowerSpriteAfter.name = 'getFlower'
+    this.getFlowerSpriteAfter.loop = false
+    this.getFlowerSpriteAfter.visible = false
+    this.getFlowerSpriteAfter.y = -50
+    this.addChild(this.getFlowerSpriteAfter)
+
+    this.hasFlowerSprite = PIXI.Sprite.from('cocoStandHasFlower')
+    this.hasFlowerSprite.visible = false
+    this.addChild(this.hasFlowerSprite)
+  }
+
   walk () {
     this.onMoving = true
     this.isWalking = true
@@ -376,14 +421,17 @@ export class Coco extends PIXI.Container {
     this.children.forEach((child) => {
       child.visible = false
     })
+    this.walkFlowerPatchSprite.visible = this.hasFlower
     this.reactionSprite.visible = this.hasReaction
     this.walkSprite.gotoAndPlay(0)
+    this.walkFlowerPatchSprite.gotoAndPlay(0)
     this.walkSprite.visible = true
     this.eyeBlinkSprite.visible = true
     this.reverseWalkPatchSprite.visible = this.orirentation === 'right'
   }
 
   async walkTo (stopPointX: number): Promise<void> {
+    this.walkFlowerPatchSprite.visible = this.hasFlower
     await this.moveTo(stopPointX, true)
   }
 
@@ -395,9 +443,9 @@ export class Coco extends PIXI.Container {
     this.onMoving = true
     this.isDown = false
     if (stopPointX < this.x) {
-      this.orirentation == 'left'
+      this.orirentation = 'left'
     } else {
-      this.orirentation == 'right'
+      this.orirentation = 'right'
     }
     if (walk) {
       this.walk()
@@ -407,8 +455,8 @@ export class Coco extends PIXI.Container {
     const ticker = new PIXI.Ticker()
     await new Promise<void>((resolve) => {
       ticker.add(() => {
-        if ((this.orirentation == 'left' && this.x < stopPointX) ||
-        (this.orirentation == 'right' && this.x + this.width > stopPointX)) {
+        if ((this.orirentation === 'left' && this.x < stopPointX) ||
+        (this.orirentation === 'right' && this.x + this.width > stopPointX)) {
           this.stop()
           ticker.destroy()
           resolve()
@@ -440,6 +488,7 @@ export class Coco extends PIXI.Container {
     this.children.forEach((child) => {
       child.visible = false
     })
+    this.hasFlowerSprite.visible = this.hasFlower
     this.reverseWalkPatchSprite.visible = this.orirentation === 'right'
     this.baseSprite.visible = true
     this.reactionSprite.visible = this.hasReaction
@@ -576,6 +625,7 @@ export class Coco extends PIXI.Container {
     this.children.forEach((child) => {
       child.visible = false
     })
+    this.hasFlowerSprite.visible = this.hasFlower
     if (on) {
       this.faceUpSprite.visible = true
       this.reverseFaceUpSprite.visible = this.orirentation === 'right'
@@ -686,14 +736,31 @@ export class Coco extends PIXI.Container {
     this.walkSprite.animationSpeed = _walkSpeed / 60
   }
 
-  async getFlower (): Promise<void> {
-    // TODO getFlower関数
-    await Common.sleep(2000)
+  async getFlowerBefore (): Promise<void> {
+    this.getFlowerSpriteBefore.visible = true
+    this.getFlowerSpriteBefore.gotoAndPlay(0)
+    await new Promise<void>((resolve) => {
+      this.getFlowerSpriteBefore.onComplete = () => {
+        resolve()
+      }
+    })
+  }
+
+  async getFlowerAfter (): Promise<void> {
+    this.getFlowerSpriteAfter.visible = true
+    this.getFlowerSpriteAfter.gotoAndPlay(0)
+    this.getFlowerSpriteBefore.visible = false
+    this.hasFlower = true
+    await new Promise<void>((resolve) => {
+      this.getFlowerSpriteAfter.onComplete = () => {
+        resolve()
+      }
+    })
   }
 
   async getGiftBag (): Promise<void> {
     // TODO torikoからのプレゼントをもらう
-    // TODO 退場時のアニメーション　腕を変形
+    // TODO 退場時のアニメーション 腕を変形
     await Common.sleep(2000)
   }
 }

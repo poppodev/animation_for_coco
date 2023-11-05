@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js'
 import * as Common from '../common'
-import { ScriptElementKind } from 'typescript'
 
 export class Sunny extends PIXI.Container {
   app: PIXI.Application
@@ -61,7 +60,7 @@ export class Sunny extends PIXI.Container {
   }
 
   async givePresent (on: boolean = true) {
-    const stopAngle = -60
+    const stopAngle = -55
     if (this.armSprite.rotation < 0) {
       on = false
     }
@@ -90,7 +89,7 @@ export class Sunny extends PIXI.Container {
     })
   }
 
-  armAfterEffect(){
+  private armAfterEffect () {
     this.hairSprites.forEach((hair) => {
       const fromDegree = Common.rad2deg(hair.rotation)
       const toDegree = fromDegree + Common.randomNumber(4, 8)

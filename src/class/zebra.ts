@@ -237,11 +237,12 @@ export class Zebra extends PIXI.Container {
 
 class PaperPiece extends PIXI.Graphics {
   reachPointX: number = -300 + Common.randomNumber(0, 200)
-  reachPointY: number = 50 + Common.randomNumber(0, 100)
+  reachPointY: number = 20 + Common.randomNumber(0, 100)
   fallPointX: number = this.reachPointX + Common.randomNumber(-200, 0)
   fallPointY: number = 820 + Common.randomNumber(0, 100)
   size: number = Common.randomNumber(15, 40)
   isTriangle: boolean = Common.randomTrueOrFalse(30)
+  
   constructor () {
     super()
     if (this.isTriangle) {

@@ -4,7 +4,7 @@ import { Coco } from './class/coco'
 import { Komatsu } from './class/komatsu'
 import { Toriko } from './class/toriko'
 import { Sunny } from './class/sunny'
-import { Queen, QueenShadow } from './class/queen'
+import { Queen } from './class/queen'
 import { Zebra } from './class/zebra'
 import './styles/index.css'
 
@@ -46,13 +46,12 @@ async function setUp () {
   const sunny = new Sunny(app, 0.4)
   queen.addChild(sunny)
   const zebra = new Zebra(app, 0.4)
-  const queenShadow = new QueenShadow(queen.width)
+  
   app.stage.addChild(toriko)
   app.stage.addChild(queen)
   app.stage.addChild(komatsu)
   app.stage.addChild(coco)
   app.stage.addChild(zebra)
-  app.stage.addChild(queenShadow)
 
   // coco appear
   coco.walkTo(initialX).then(() => {
@@ -61,7 +60,7 @@ async function setUp () {
 
   // TODO 検証中
   // const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]
-  const functions = [sunnyAppear]
+  const functions = [zebraAppear]
   const calledFunctions = new Set()
   document.getElementById('HBD')!.addEventListener('click', function () {
     if (onEvent) {
@@ -273,9 +272,11 @@ async function setUp () {
 
     const startPointX = initialX - 160
 
-    // TODO queen のshadow固定
-    await Promise.all([comeCoco(), queen.appear()])
-    queenShadow.appear()
+    const stopX = 150
+    const stopY = -260 * queen.baseScale
+    const fromX = 0
+    const fromY = -queen.height
+    await Promise.all([comeCoco(), queen.appear(fromX, fromY, stopX, stopY)])
 
     coco.faceUp()
     await Common.sleep(1500)
@@ -322,7 +323,11 @@ async function setUp () {
 
   async function zebraAppear () {
     setOnEvent(true)
-    // TODO ajust coco initial position
+    const startX = app.renderer.width * 2/ 5
+    if (startX < coco.x) {
+      await coco.walkTo(startX)
+    }
+
 
     // appear from right
     zebra.reset()

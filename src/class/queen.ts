@@ -6,6 +6,9 @@ export class Queen extends PIXI.Container {
   app: PIXI.Application
   private readonly baseSprite!: PIXI.Sprite
   manual: boolean = false
+  baseScale: number = 0.5
+  shadow!: QueenShadow
+  shadowDiff: number = 565
 
   constructor (app: PIXI.Application, scale: number = 0.5, manual: boolean = false) {
     super()
@@ -20,9 +23,17 @@ export class Queen extends PIXI.Container {
     this.baseSprite = baseSprite
     this.x = -this.width
     this.y = -this.height
+    this.baseScale = scale
+
+    const shadow = new QueenShadow(this.width*scale)
+    this.shadow = shadow
+    this.shadow.x = 300
+    this.shadow.y = this.height
+    this.addChildAt(shadow, 0)
+    console.log(`shadow.y:${shadow.y},this.y:${this.y}`)
   }
 
-  async appear (): Promise<void> {
+  async appear (fromX: number , fromY: number, stopX: number, stopY: number): Promise<void> {
     console.log('appear')
     this.visible = true
     const sunny: Sunny = this.getChildByName('sunny') as Sunny
@@ -30,11 +41,11 @@ export class Queen extends PIXI.Container {
     sunny.reset()
     sunny.setDown(true)
 
-    await this.appearDown()
+    this.shadow.appear()
+    await this.appearDown(fromX, fromY, stopX, stopY)
     await this.moveVertical(20, 3)
     await this.moveVertical(20, -3)
 
-    // await Common.sleep(600)
     sunny.setDown(false)
     sunny.hairBound()
   }
@@ -44,21 +55,16 @@ export class Queen extends PIXI.Container {
     sunny.setUp(true)
     await this.moveVertical(20, 3)
     await this.moveVertical(20, -3)
+    Common.sleep(1000).then(() => { this.shadow.leave() })
     await this.getOutUp()
     this.visible = false
     sunny.setUp(false)
   }
 
-  private async appearDown () {
-    const stopPointX = 150
-    const stopPointY = -260 * this.baseSprite.scale.y
-
-    const startPointX = 0
-    const startPointY = -this.height
-
+  private async appearDown (fromX: number , fromY: number, stopX: number, stopY: number): Promise<void> {
     // start position
-    this.x = startPointX
-    this.y = startPointY
+    this.x = fromX
+    this.y = fromY
 
     if (this.getChildByName('sunny') !== null) {
       const sunny = this.getChildByName('sunny') as Sunny
@@ -66,16 +72,19 @@ export class Queen extends PIXI.Container {
     }
 
     const duration = 120
-    const xStep = (stopPointX - startPointX) / duration
-    const yStep = (stopPointY - startPointY) / duration
+    const xStep = (stopX - fromX) / duration
+    const yStep = (stopY - fromY) / duration
 
     const appearTicker = new PIXI.Ticker()
     await new Promise<void>((resolve) => {
       appearTicker.add(async () => {
-        if (this.x < stopPointX) {
+        if (this.x < stopX) {
           this.x += xStep
           this.y += yStep
+          this.shadow.y = - this.y + this.shadowDiff
         } else {
+          //
+          this.shadow.y = - this.y + this.shadowDiff
           resolve()
           appearTicker.destroy()
         }
@@ -90,6 +99,7 @@ export class Queen extends PIXI.Container {
     await new Promise<void>((resolve) => {
       ticker.add(() => {
         this.y += step
+        this.shadow.y = - this.y + this.shadowDiff
         moved += step
         if (Math.abs(moved) >= distance) {
           resolve()
@@ -120,6 +130,7 @@ export class Queen extends PIXI.Container {
         if (this.x < stopPointX) {
           this.x += xStep
           this.y += yStep
+          this.shadow.y = - this.y + this.shadowDiff
         } else {
           resolve()
           appearTicker.destroy()
@@ -130,14 +141,16 @@ export class Queen extends PIXI.Container {
   }
 }
 
-export class QueenShadow extends PIXI.Graphics {
+class QueenShadow extends PIXI.Graphics {
   constructor (qunnSize: number) {
     super()
     console.log(`queenSize:${qunnSize}`)
-    const shadowGraphics = new PIXI.Graphics()
-    shadowGraphics.beginFill(0x000000, 0.15)
-    shadowGraphics.drawEllipse(0, 0, qunnSize, 20)
-    shadowGraphics.endFill()
+    this.beginFill(0x000000, 0.15)
+    this.drawEllipse(0, 0, qunnSize, 20)
+    this.endFill()
+    this.x = 0
+    this.y = 100
+    this.alpha = 0
   }
 
   async appear (): Promise<void> {
@@ -146,7 +159,7 @@ export class QueenShadow extends PIXI.Graphics {
     const ticker = new PIXI.Ticker()
     await new Promise<void>((resolve) => {
       ticker.add(() => {
-        this.alpha += 0.05
+        this.alpha += 0.01
         if (this.alpha >= 1) {
           ticker.destroy()
           resolve()
@@ -159,13 +172,15 @@ export class QueenShadow extends PIXI.Graphics {
   async leave (): Promise<void> {
     console.log('leave shadow')
     const ticker = new PIXI.Ticker()
-    ticker.add(() => {
-      this.alpha -= 0.05
-      if (this.alpha <= 1) {
-        ticker.destroy()
-        Promise.resolve()
-      }
+    await new Promise<void>((resolve) => {
+      ticker.add(() => {
+        this.alpha -= 0.01
+        if (this.alpha <= 0) {
+          ticker.destroy()
+          resolve()
+        }
+      })
+      ticker.start()
     })
-    ticker.start()
   }
 }

@@ -142,15 +142,19 @@ async function setUp () {
 
   // trigers for sunny
   document.getElementById('sunny')!.addEventListener('click', function () {
+    const stopX = 150
+    const stopY = -260 * queen.baseScale
+    const fromX = 0
+    const fromY = -queen.height
     if (!app.stage.children.includes(queen)) {
       app.stage.addChild(queen)
-      queen.appear()
+      queen.appear(fromX, fromY, stopX, stopY)
     } else {
       if (queen.visible) {
         queen.getOut()
       } else {
-        queen.appear()
-      }
+        queen.appear(fromX, fromY, stopX, stopY)
+        }
     }
   })
   document.getElementById('smileSunny')!.addEventListener('click', function () {

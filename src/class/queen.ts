@@ -82,6 +82,7 @@ export class Queen extends PIXI.Container {
     const yStep = (stopY - fromY) / duration
 
     const appearTicker = new PIXI.Ticker()
+    appearTicker.maxFPS = 60
     await new Promise<void>((resolve) => {
       appearTicker.add(async () => {
         if (this.x < stopX) {
@@ -101,6 +102,7 @@ export class Queen extends PIXI.Container {
 
   private async moveVertical (distance: number, step: number): Promise<void> {
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     let moved = 0
     await new Promise<void>((resolve) => {
       ticker.add(() => {
@@ -131,6 +133,7 @@ export class Queen extends PIXI.Container {
     const xStep = (stopPointX - startPointX) / duration
     const yStep = (stopPointY - startPointY) / duration
     const appearTicker = new PIXI.Ticker()
+    appearTicker.maxFPS = 60
     await new Promise<void>((resolve) => {
       appearTicker.add(() => {
         if (this.x < stopPointX) {
@@ -161,6 +164,7 @@ class QueenShadow extends PIXI.Graphics {
 
   async appear (): Promise<void> {
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     await new Promise<void>((resolve) => {
       ticker.add(() => {
         this.alpha += 0.01
@@ -175,6 +179,7 @@ class QueenShadow extends PIXI.Graphics {
 
   async leave (): Promise<void> {
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     await new Promise<void>((resolve) => {
       ticker.add(() => {
         this.alpha -= 0.01

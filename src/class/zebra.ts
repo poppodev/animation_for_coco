@@ -171,6 +171,7 @@ export class Zebra extends PIXI.Container {
 
   private async bangEffect () {
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     const panDeleteWaitFrame = 30
     let frame = 0
     await new Promise<void>((resolve) => {
@@ -213,6 +214,7 @@ export class Zebra extends PIXI.Container {
   async walkTo (stopPointX: number): Promise<void> {
     this.walk()
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     await new Promise<void>((resolve) => {
       ticker.add(() => {
         if (this.x < stopPointX) {
@@ -264,6 +266,7 @@ class PaperPiece extends PIXI.Graphics {
 
   async reachTop (): Promise<void> {
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     await new Promise<void>((resolve) => {
       ticker.add(() => {
         this.x += (this.reachPointX - this.x) / 10
@@ -281,6 +284,7 @@ class PaperPiece extends PIXI.Graphics {
 
   async fall (): Promise<void> {
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     const scaleMultiplier = Common.randomNumber(100, 200) / 100
     const anglePlus = Common.randomNumber(200, 500) / 100
     const isScaleChange = Common.randomTrueOrFalse(50)

@@ -480,6 +480,7 @@ export class Coco extends PIXI.Container {
       this.run()
     }
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     await new Promise<void>((resolve) => {
       ticker.add(() => {
         if ((this.orirentation === 'left' && this.x < stopPointX) ||
@@ -741,6 +742,7 @@ export class Coco extends PIXI.Container {
     this.reactionSprite.y = -150
 
     const messageTicker = new PIXI.Ticker()
+    messageTicker.maxFPS = 60
     let waitCount = 40
     await new Promise<void>((resolve) => {
       messageTicker.add(() => {

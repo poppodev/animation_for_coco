@@ -242,6 +242,7 @@ class Sparkle extends PIXI.Graphics {
 
   async blink (): Promise<void> {
     const effectTicker = new PIXI.Ticker()
+    effectTicker.maxFPS = 60
     await Common.sleep(this.waitingTime)
     new Promise<void>((resolve) => {
       let frame = 0

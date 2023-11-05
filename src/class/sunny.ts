@@ -67,6 +67,7 @@ export class Sunny extends PIXI.Container {
 
     new Promise<void>((resolve) => {
       const ticker = new PIXI.Ticker()
+      ticker.maxFPS = 60
       ticker.add(() => {
         if (on) {
           if (this.armSprite.angle < stopAngle) {
@@ -151,6 +152,7 @@ class Hair extends PIXI.Sprite {
     this.visible = true
 
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     let angle = 0
     let isPlus = false
     const flutterMaxAngle = Common.randomNumber(10, 15)
@@ -190,6 +192,7 @@ class Hair extends PIXI.Sprite {
   async flutter (startDegree: number, stopDegree: number, speed: number = 1): Promise<void> {
     await new Promise<void>((resolve) => {
       const ticker = new PIXI.Ticker()
+      ticker.maxFPS = 60
       let degree = startDegree
       ticker.add(() => {
         if (startDegree > stopDegree) {
@@ -214,6 +217,7 @@ class Hair extends PIXI.Sprite {
   private async _bound (startDegree: number, stopDegree: number): Promise<void> {
     await new Promise<void>((resolve) => {
       const ticker = new PIXI.Ticker()
+      ticker.maxFPS = 60
       let degree = startDegree
       let touched = false
       let frame = 0

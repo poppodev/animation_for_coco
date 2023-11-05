@@ -70,8 +70,8 @@ async function setUp () {
       resetFunctions()
       availableFunctions = functions.filter(func => !calledFunctions.has(func))
     }
-    const randomIndex = Math.floor(Math.random() * availableFunctions.length)
-    const selectedFunction = availableFunctions[randomIndex]
+    // const randomIndex = Math.floor(Math.random() * availableFunctions.length)
+    const selectedFunction = availableFunctions[0]
     calledFunctions.add(selectedFunction)
     selectedFunction()
   })
@@ -132,6 +132,19 @@ async function setUp () {
     }
   })
 
+  // TODO delete after
+  let elapsed = 0
+  let count = 0
+  app.ticker.add((delta) => {
+    elapsed += delta
+    if (elapsed >= 60 && count < 10) {
+      const currentFPS = app.ticker.FPS.toFixed(2)
+      console.log(`Current FPS: ${currentFPS}`)
+      elapsed = 0
+      count += 1
+    }
+  })
+
   // inner functions
 
   function resetFunctions () {
@@ -152,6 +165,7 @@ async function setUp () {
     komatsu.walk()
 
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     let reacted = false
     ticker.add(async () => {
       if (komatsu.x > -45) {
@@ -238,6 +252,7 @@ async function setUp () {
     coco.walk()
 
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     ticker.add(async () => {
       if (toriko.x - coco.width / 2 < coco.x) {
         ticker.stop()
@@ -348,6 +363,7 @@ async function setUp () {
     coco.walk()
 
     const ticker = new PIXI.Ticker()
+    ticker.maxFPS = 60
     ticker.add(async () => {
       if (zebra.x - coco.width / 4 < coco.x) {
         ticker.stop()

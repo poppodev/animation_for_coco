@@ -554,7 +554,7 @@ export class Coco extends PIXI.Container {
           resolve()
         } else if (this.faceUpSprite.visible) {
           this.smileSprite.visible = true
-          this.smileSprite.rotation = Common.deg2rad(12)
+          this.smileSprite.angle = 12
           this.smileSprite.x = 49
           this.smileSprite.y = -88
           resolve()
@@ -596,7 +596,7 @@ export class Coco extends PIXI.Container {
       this.surpriseSprite.y = 100
     } else if (this.faceUpSprite.visible) {
       this.surpriseSprite.visible = true
-      this.surpriseSprite.rotation = Common.deg2rad(12)
+      this.surpriseSprite.angle = 12
       this.surpriseSprite.x = 49
       this.surpriseSprite.y = -88
     } else {

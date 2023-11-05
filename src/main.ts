@@ -58,8 +58,7 @@ async function setUp () {
     setOnEvent(false)
   })
 
-  // const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear] TODO 検証中
-  const functions = [sunnyAppear]
+  const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]
   const calledFunctions = new Set()
   document.getElementById('HBD')!.addEventListener('click', function () {
     if (onEvent) {

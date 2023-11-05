@@ -66,9 +66,34 @@ export class Sunny extends PIXI.Container {
       on = false
     }
 
+    new Promise<void>((resolve) => {
+      const ticker = new PIXI.Ticker()
+      ticker.add(() => {
+        if (on) {
+          if (this.armSprite.angle < stopAngle) {
+            resolve()
+            ticker.destroy()
+          } else {
+            this.armSprite.angle -= 2
+          }
+        } else {
+          if (this.armSprite.angle > 0) {
+            this.armAfterEffect()
+            resolve()
+            ticker.destroy()
+          } else {
+            this.armSprite.angle += 2
+          }
+        }
+      })
+      ticker.start()
+    })
+  }
+
+  armAfterEffect(){
     this.hairSprites.forEach((hair) => {
       const fromDegree = Common.rad2deg(hair.rotation)
-      const toDegree = fromDegree + Common.randomNumber(8, 12)
+      const toDegree = fromDegree + Common.randomNumber(4, 8)
       hair.flutter(fromDegree, toDegree)
         .then(() => {
           hair.flutter(toDegree, fromDegree)
@@ -77,28 +102,6 @@ export class Sunny extends PIXI.Container {
                 .then(() => { hair.flutter(toDegree, fromDegree) })
             })
         })
-    })
-
-    new Promise<void>((resolve) => {
-      const ticker = new PIXI.Ticker()
-      ticker.add(() => {
-        if (on) {
-          if (this.armSprite.rotation < Common.deg2rad(stopAngle)) {
-            resolve()
-            ticker.destroy()
-          } else {
-            this.armSprite.rotation -= Common.deg2rad(2)
-          }
-        } else {
-          if (this.armSprite.rotation > Common.deg2rad(0)) {
-            resolve()
-            ticker.destroy()
-          } else {
-            this.armSprite.rotation += Common.deg2rad(2)
-          }
-        }
-      })
-      ticker.start()
     })
   }
 
@@ -123,7 +126,7 @@ export class Sunny extends PIXI.Container {
   reset () {
     this.armSprite.texture = PIXI.Texture.from('sunnyArm')
     this.hairSprites.forEach((hair) => {
-      hair.rotation = Common.deg2rad(hair.maxDegree)
+      hair.angle = hair.maxDegree
     })
   }
 
@@ -149,28 +152,28 @@ class Hair extends PIXI.Sprite {
     this.visible = true
 
     const ticker = new PIXI.Ticker()
-    let rotate = 0
+    let angle = 0
     let isPlus = false
-    const flutterMax = Common.randomNumber(10, 15)
-    const flutterMin = -Common.randomNumber(10, 15)
+    const flutterMaxAngle = Common.randomNumber(10, 15)
+    const flutterMinAngle = -Common.randomNumber(10, 15)
 
     ticker.add(() => {
       if (this.isDown || this.isUp) {
-        const baseRotate = (this.isDown) ? Common.deg2rad(this.maxDegree) : Common.deg2rad(this.defaultDegree)
+        const baseAngle = (this.isDown) ? this.maxDegree : this.defaultDegree
         if (isPlus) {
-          if (rotate > flutterMax) {
+          if (angle > flutterMaxAngle) {
             isPlus = false
           }
-          rotate += 0.7
+          angle += 0.7
         } else {
-          if (rotate < flutterMin) {
+          if (angle < flutterMinAngle) {
             isPlus = true
           }
-          rotate -= 0.7
+          angle -= 0.7
         }
-        this.rotation = baseRotate + Common.deg2rad(rotate)
+        this.angle = baseAngle + angle
       } else {
-        rotate = 0
+        angle = 0
         isPlus = false
       }
     })
@@ -178,8 +181,6 @@ class Hair extends PIXI.Sprite {
   }
 
   async bound (): Promise<void> {
-    // TODO rotation -> angle
-    // TODO 微調整
     await this._bound(this.angle, this.maxDegree * 2 / 3)
     await this.flutter(this.maxDegree * 2 / 3, this.defaultDegree - 10)
     await this.flutter(this.defaultDegree - 10, this.maxDegree / 4)
@@ -205,7 +206,7 @@ class Hair extends PIXI.Sprite {
             ticker.destroy()
           }
         }
-        this.rotation = Common.deg2rad(degree)
+        this.angle = degree
       })
       ticker.start()
     })
@@ -226,7 +227,7 @@ class Hair extends PIXI.Sprite {
           } else {
             frame -= 0.7
             degree += Math.abs(frame * 0.1)
-            this.rotation = Common.deg2rad(degree)
+            this.angle = degree
           }
         } else {
           // go
@@ -235,7 +236,7 @@ class Hair extends PIXI.Sprite {
           } else {
             frame += 0.8
             degree -= frame * 0.11
-            this.rotation = Common.deg2rad(degree)
+            this.angle = degree
           }
         }
       })

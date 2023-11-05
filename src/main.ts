@@ -67,12 +67,12 @@ async function setUp () {
     }
     let availableFunctions = functions.filter(func => !calledFunctions.has(func))
     if (availableFunctions.length === 0) {
-      resetFunctions()
+            resetFunctions()
       availableFunctions = functions.filter(func => !calledFunctions.has(func))
     }
     const randomIndex = Math.floor(Math.random() * availableFunctions.length)
-    const selectedFunction = availableFunctions[0]
-    calledFunctions.add(randomIndex)
+    const selectedFunction = availableFunctions[randomIndex]
+    calledFunctions.add(selectedFunction)
     selectedFunction()
   })
 

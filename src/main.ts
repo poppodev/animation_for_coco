@@ -139,7 +139,7 @@ async function setUp () {
     elapsed += delta
     if (elapsed >= 60 && count < 10) {
       const currentFPS = app.ticker.FPS.toFixed(2)
-      console.log(`Current FPS: ${currentFPS}`)
+      console.log(`Current FPS: ${currentFPS},delta: ${delta}`)
       elapsed = 0
       count += 1
     }

@@ -59,7 +59,7 @@ async function setUp () {
   })
 
   // const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear] TODO 検証中
-  const functions = [komatsuAppear]
+  const functions = [sunnyAppear]
   const calledFunctions = new Set()
   document.getElementById('HBD')!.addEventListener('click', function () {
     if (onEvent) {
@@ -272,7 +272,7 @@ async function setUp () {
     const stopX = 150
     const stopY = -260 * queen.baseScale
     const fromX = 0
-    const fromY = -queen.height
+    const fromY = -queen.baseHeight
     await Promise.all([comeCoco(), queen.appear(fromX, fromY, stopX, stopY)])
 
     coco.faceUp()

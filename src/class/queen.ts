@@ -9,6 +9,7 @@ export class Queen extends PIXI.Container {
   baseScale: number = 0.5
   shadow!: QueenShadow
   shadowDiff: number = 565
+  baseHeight: number = 0
 
   constructor (app: PIXI.Application, scale: number = 0.5, manual: boolean = false) {
     super()
@@ -21,15 +22,22 @@ export class Queen extends PIXI.Container {
     baseSprite.scale.set(scale)
     this.addChild(baseSprite)
     this.baseSprite = baseSprite
-    this.x = -this.width
-    this.y = -this.height
     this.baseScale = scale
+    this.baseHeight = baseSprite.height
 
     const shadow = new QueenShadow(this.width * scale)
     this.shadow = shadow
     this.shadow.x = 300
     this.shadow.y = this.height
     this.addChildAt(shadow, 0)
+
+    this.reset()
+  }
+
+  reset () {
+    this.x = -this.width
+    this.y = -this.height
+    this.shadow.y = -this.y + this.shadowDiff
   }
 
   async appear (fromX: number, fromY: number, stopX: number, stopY: number): Promise<void> {
@@ -130,6 +138,7 @@ export class Queen extends PIXI.Container {
           this.y += yStep
           this.shadow.y = -this.y + this.shadowDiff
         } else {
+          this.reset()
           resolve()
           appearTicker.destroy()
         }

@@ -143,7 +143,7 @@ async function setUp () {
     const stopX = 150
     const stopY = -260 * queen.baseScale
     const fromX = 0
-    const fromY = -queen.height
+    const fromY = -queen.baseHeight
     if (!app.stage.children.includes(queen)) {
       app.stage.addChild(queen)
       queen.appear(fromX, fromY, stopX, stopY)

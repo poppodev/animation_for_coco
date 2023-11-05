@@ -180,7 +180,7 @@ class Hair extends PIXI.Sprite {
   async bound (): Promise<void> {
     // TODO rotation -> angle
     // TODO 微調整
-    await this._bound(Common.rad2deg(this.rotation), this.maxDegree * 2 / 3)
+    await this._bound(this.angle, this.maxDegree * 2 / 3)
     await this.flutter(this.maxDegree * 2 / 3, this.defaultDegree - 10)
     await this.flutter(this.defaultDegree - 10, this.maxDegree / 4)
     await this.flutter(this.maxDegree / 4, this.defaultDegree - 5, 0.5)

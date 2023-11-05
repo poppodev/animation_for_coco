@@ -25,13 +25,7 @@ export class Zebra extends PIXI.Container {
     this.baseSprite.name = 'zebraBase'
 
     // shadow
-    const shadowGraphics = new PIXI.Graphics()
-    shadowGraphics.beginFill(0x000000, 0.15)
-    shadowGraphics.drawEllipse(0, 0, 150, 20)
-    shadowGraphics.endFill()
-    shadowGraphics.x = 300
-    shadowGraphics.y = this.baseSprite.height - 30
-    this.baseSprite.addChildAt(shadowGraphics, 0)
+    this.baseSprite.addChildAt(this.shadow(150), 0)
     this.addChild(this.baseSprite)
 
     // animationSprites
@@ -72,22 +66,25 @@ export class Zebra extends PIXI.Container {
     this.popperSprite.loop = false
     this.popperSprite.animationSpeed = 0.15
     this.popperSprite.visible = false
+    this.popperSprite.addChildAt(this.shadow(150), 0)
     this.addChild(this.popperSprite)
 
     // doPopper
     this.popperPullSprite = PIXI.Sprite.from('zebraPopper9')
     this.popperPullSprite.name = 'zebraPopperPull'
     this.popperPullSprite.visible = false
+    this.popperPullSprite.addChildAt(this.shadow(150), 0)
     this.addChild(this.popperPullSprite)
+  }
 
-    // shadow
+  private shadow (width: number): PIXI.Graphics {
     const shadowGraphics = new PIXI.Graphics()
     shadowGraphics.beginFill(0x000000, 0.15)
-    shadowGraphics.drawEllipse(0, 0, 150, 20)
+    shadowGraphics.drawEllipse(0, 0, width, 20)
     shadowGraphics.endFill()
     shadowGraphics.x = 300
     shadowGraphics.y = this.baseSprite.height - 30
-    this.popperSprite.addChildAt(shadowGraphics, 0)
+    return shadowGraphics
   }
 
   private setWlakSprite () {
@@ -108,20 +105,14 @@ export class Zebra extends PIXI.Container {
     this.walkSprite.visible = false
 
     // shadow
-    const shadowGraphics = new PIXI.Graphics()
-    shadowGraphics.beginFill(0x000000, 0.15)
-    shadowGraphics.drawEllipse(0, 0, 220, 20)
-    shadowGraphics.endFill()
-    shadowGraphics.x = 320
-    shadowGraphics.y = this.baseSprite.height - 30
-    this.walkSprite.addChildAt(shadowGraphics, 0)
+    this.walkSprite.addChildAt(this.shadow(220), 0)
 
     this.walkSprite.play()
     this.addChild(this.walkSprite)
   }
 
   reset () {
-    this.y = this.app.renderer.height - 410
+    this.y = this.app.renderer.height - 408
     this.baseSprite.visible = true
     if (this.manual) {
       this.x = this.app.renderer.width - this.width

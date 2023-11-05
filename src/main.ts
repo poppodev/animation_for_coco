@@ -54,13 +54,12 @@ async function setUp () {
   app.stage.addChild(zebra)
 
   // coco appear
-  coco.walkTo(initialX).then(() => {
+  await coco.walkTo(initialX).then(() => {
     setOnEvent(false)
   })
 
-  // TODO 検証中
-  // const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]
-  const functions = [zebraAppear]
+  // functions call
+  const functions = [komatsuAppear, torikoAppear, sunnyAppear, zebraAppear]
   const calledFunctions = new Set()
   document.getElementById('HBD')!.addEventListener('click', function () {
     if (onEvent) {
@@ -78,7 +77,7 @@ async function setUp () {
   })
 
   // key triggers
-  // TODO keytrigger管理をもうちょっときれいにしたい
+  // TODO refactor key triggers
   let shiftDown = false
   document.addEventListener('keydown', async (event) => {
     const targetKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Shift']
@@ -218,9 +217,13 @@ async function setUp () {
     setOnEvent(true)
 
     // ajust coco start position
-    const startX = app.renderer.width / 2
-    if (startX < coco.x) {
-      await coco.walkTo(startX)
+    const initialPosition = app.renderer.width / 3
+    const cocoStartX = (coco.orirentation === 'left') ? coco.x : coco.x + coco.width
+    if (cocoStartX > initialPosition) {
+      if (coco.orirentation === 'right') {
+        await coco.turn()
+      }
+      await coco.walkTo(initialPosition)
     }
 
     // appear from right
@@ -272,7 +275,7 @@ async function setUp () {
   async function sunnyAppear () {
     setOnEvent(true)
 
-    const startPointX = initialX - 160
+    const startPointX = initialX - 150
 
     const stopX = 150
     const stopY = -260 * queen.baseScale
@@ -368,10 +371,10 @@ async function setUp () {
         await Common.sleep(1000)
         await coco.turn()
         coco.smile()
+        Common.sleep(1500).then(async () => { coco.smile(false) })
 
         zebra.walkTo(-zebra.width).then(() => {
           setOnEvent(false)
-          coco.smile(false)
           zebra.reset()
         })
 

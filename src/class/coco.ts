@@ -71,11 +71,13 @@ export class Coco extends PIXI.Container {
     this.setTurnLeftSprite()
 
     // git sprite
-    this.setGetFlowerSprite()
     this.setGetGiftSprite()
 
     // parts sprites
     this.setPatchSprites()
+
+    // flower sprite
+    this.setGetFlowerSprite()
 
     // reation
     this.setReactionSprite()
@@ -466,7 +468,8 @@ export class Coco extends PIXI.Container {
   private async moveTo (stopPointX: number, walk: boolean): Promise<void> {
     this.onMoving = true
     this.isDown = false
-    if (stopPointX < this.x) {
+    const startX = (this.orirentation === 'left') ? this.x : this.x + this.width
+    if (stopPointX < startX) {
       this.orirentation = 'left'
     } else {
       this.orirentation = 'right'
@@ -735,6 +738,7 @@ export class Coco extends PIXI.Container {
     this.reactionSprite.alpha = 1
     const direction = this.orirentation === 'left' ? 1 : -1
     this.reactionSprite.x = direction * this.width + 20
+    this.reactionSprite.y = -150
 
     const messageTicker = new PIXI.Ticker()
     let waitCount = 40
@@ -772,6 +776,7 @@ export class Coco extends PIXI.Container {
   }
 
   async getFlowerAfter (): Promise<void> {
+    this.baseSprite.visible = false
     this.getFlowerSpriteAfter.visible = true
     this.getFlowerSpriteAfter.gotoAndPlay(0)
     this.getFlowerSpriteBefore.visible = false

@@ -184,12 +184,10 @@ export class Komatsu extends PIXI.Container {
   }
 
   removeCakeCover () {
-    console.log('remove cake cover')
     this.cakeCoverSprite.visible = false
   }
 
   appendCakeCover () {
-    console.log('append cake cover')
     this.cakeCoverSprite.visible = true
   }
 

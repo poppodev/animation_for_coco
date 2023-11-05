@@ -369,7 +369,6 @@ export class Coco extends PIXI.Container {
   }
 
   walk () {
-    console.log('walk')
     this.onMoving = true
     this.isWalking = true
     this.isRunning = false
@@ -410,7 +409,6 @@ export class Coco extends PIXI.Container {
       ticker.add(() => {
         if ((this.orirentation == 'left' && this.x < stopPointX) ||
         (this.orirentation == 'right' && this.x + this.width > stopPointX)) {
-          console.log('stop')
           this.stop()
           ticker.destroy()
           resolve()
@@ -421,7 +419,6 @@ export class Coco extends PIXI.Container {
   }
 
   run () {
-    console.log('run')
     this.onMoving = true
     this.isDown = false
     this.isWalking = false

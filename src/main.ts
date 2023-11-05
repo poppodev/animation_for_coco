@@ -58,7 +58,8 @@ async function setUp () {
     setOnEvent(false)
   })
 
-  const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]
+  // const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear] TODO 検証中
+  const functions = [komatsuAppear]
   const calledFunctions = new Set()
   document.getElementById('HBD')!.addEventListener('click', function () {
     if (onEvent) {
@@ -66,7 +67,6 @@ async function setUp () {
     }
     let availableFunctions = functions.filter(func => !calledFunctions.has(func))
     if (availableFunctions.length === 0) {
-      console.log('All functions have been called')
       resetFunctions()
       availableFunctions = functions.filter(func => !calledFunctions.has(func))
     }
@@ -138,10 +138,9 @@ async function setUp () {
   }
 
   async function komatsuAppear () {
-    // TODO ラストコールの時にticker系でエラーが出ている？画面左端にいたせいかも？
     setOnEvent(true)
-
-    if (coco.x < app.renderer.width / 3) {
+    const cocoStartX = (coco.orirentation === 'left') ? coco.x : coco.x + coco.width
+    if (cocoStartX < app.renderer.width / 3) {
       if (coco.orirentation === 'left') {
         await coco.turn()
       }

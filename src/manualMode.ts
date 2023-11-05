@@ -16,13 +16,11 @@ const app = new PIXI.Application({
 })
 
 window.addEventListener('load', () => {
-  console.log('loadbefore')
   PIXI.Assets.load(Common.imageSrcs)
     .then(setUp)
 })
 
 async function setUp () {
-  console.log('startSetup')
   const appView = app.view as HTMLCanvasElement | null
   if (appView) {
     document.getElementById('mainCanvas')!.appendChild(appView)

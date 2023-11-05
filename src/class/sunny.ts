@@ -128,7 +128,6 @@ export class Sunny extends PIXI.Container {
   }
 
   hairBound () {
-    console.log('hairBound')
     this.hairSprites.forEach((hair) => {
       setTimeout(async () => { await hair.bound() }, Common.randomNumber(0, 100))
     })

@@ -26,6 +26,7 @@ export class Toriko extends PIXI.Container {
     this.rightArmSprite.name = 'torikoRightArm'
     this.rightArmSprite.loop = false
     this.rightArmSprite.animationSpeed = 0.1
+    // this.rightArmSprite.angle = 10
     this.addChild(this.rightArmSprite)
 
     // base

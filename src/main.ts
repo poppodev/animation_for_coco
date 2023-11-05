@@ -60,7 +60,7 @@ async function setUp () {
 
   // TODO 検証中
   // const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]
-  const functions = [torikoAppear]
+  const functions = [zebraAppear]
   const calledFunctions = new Set()
   document.getElementById('HBD')!.addEventListener('click', function () {
     if (onEvent) {
@@ -243,15 +243,18 @@ async function setUp () {
 
         await toriko.givePresent()
         await Common.sleep(1000)
-        coco.smile()
-        await Common.sleep(1500)
+
         toriko.removeGift()
         await coco.getGiftBag()
+        coco.smile()
+        await Common.sleep(1000)
+        // coco.smile(false)
 
         // toriko away
         toriko.walk()
         await Common.sleep(1000)
         await coco.walkTo(app.renderer.width)
+        coco.hasGiftBag = false
 
         // back to initial position
         await coco.turn()

@@ -10,6 +10,7 @@ export class Coco extends PIXI.Container {
   isDown: boolean = false
   hasReaction: boolean = false
   hasFlower: boolean = false
+  hasGiftBag: boolean = false
   manual: boolean = false
   onMoving: boolean = false
   orirentation: 'left' | 'right' = 'left'
@@ -23,6 +24,7 @@ export class Coco extends PIXI.Container {
   private smileSprite!: PIXI.Sprite
   private hasFlowerSprite!: PIXI.Sprite
   private walkSprite!: AnimatedSprite
+  private walkGiftSprite!: AnimatedSprite
   private runSprite!: AnimatedSprite
   private downSprite!: AnimatedSprite
   private standUpSprite!: AnimatedSprite
@@ -37,6 +39,7 @@ export class Coco extends PIXI.Container {
   private appendCoverSprite!: PIXI.AnimatedSprite
   private getFlowerSpriteBefore!: PIXI.AnimatedSprite
   private getFlowerSpriteAfter!: PIXI.AnimatedSprite
+  private getGiftBagSprite!: PIXI.AnimatedSprite
   private walkFlowerPatchSprite!: PIXI.AnimatedSprite
   private reactionSprite!: PIXI.Sprite
   private readonly turnMargin = 50
@@ -67,14 +70,15 @@ export class Coco extends PIXI.Container {
     this.setDownSprite()
     this.setTurnLeftSprite()
 
+    // git sprite
+    this.setGetFlowerSprite()
+    this.setGetGiftSprite()
+
     // parts sprites
     this.setPatchSprites()
 
     // reation
     this.setReactionSprite()
-
-    // git sprite
-    this.setGetFlowerSprite()
 
     // animation loop
     this.app.ticker.add(() => {
@@ -119,16 +123,7 @@ export class Coco extends PIXI.Container {
   }
 
   private setWalkSprite () {
-    const walkSrcs = [
-      'cocoWalk1',
-      'cocoWalk2',
-      'cocoWalk3',
-      'cocoWalk4',
-      'cocoWalk5',
-      'cocoWalk6',
-      'cocoWalk7',
-      'cocoWalk8'
-    ]
+    const walkSrcs = ['cocoWalk1', 'cocoWalk2', 'cocoWalk3', 'cocoWalk4', 'cocoWalk5', 'cocoWalk6', 'cocoWalk7', 'cocoWalk8']
     const walkTextures = walkSrcs.map(src => PIXI.Texture.from(src))
 
     this.walkSprite = new AnimatedSprite(walkTextures)
@@ -154,6 +149,18 @@ export class Coco extends PIXI.Container {
 
     this.addChild(this.walkSprite)
     this.addChild(this.walkFlowerPatchSprite)
+
+    // has gift sprite
+    const srcWalkGift = ['cocoWalkGift1', 'cocoWalkGift2', 'cocoWalkGift3', 'cocoWalkGift4', 'cocoWalkGift5', 'cocoWalkGift6', 'cocoWalkGift7', 'cocoWalkGift8']
+    const walkGiftTextures = srcWalkGift.map(src => PIXI.Texture.from(src))
+    this.walkGiftSprite = new AnimatedSprite(walkGiftTextures)
+    this.walkGiftSprite.animationSpeed = 0.1
+    this.walkGiftSprite.name = 'walkGift'
+    this.walkGiftSprite.loop = true
+    this.walkGiftSprite.visible = false
+    this.walkGiftSprite.play()
+    this.walkGiftSprite.addChildAt(this.shadowGraphics(170, this.baseSprite.width / 2 + 20, this.baseSprite.height - 30), 0)
+    this.addChild(this.walkGiftSprite)
   }
 
   private setRunSprite () {
@@ -413,6 +420,18 @@ export class Coco extends PIXI.Container {
     this.addChild(this.hasFlowerSprite)
   }
 
+  private setGetGiftSprite () {
+    const srcGetGift = ['cocoGiftGet', 'cocoStandHasGift']
+    const getGiftTextures = srcGetGift.map(src => PIXI.Texture.from(src))
+    this.getGiftBagSprite = new AnimatedSprite(getGiftTextures)
+    this.getGiftBagSprite.animationSpeed = 0.1
+    this.getGiftBagSprite.name = 'getGift'
+    this.getGiftBagSprite.loop = false
+    this.getGiftBagSprite.visible = false
+    this.getGiftBagSprite.addChildAt(this.shadowGraphics(150, this.baseSprite.width / 2, this.baseSprite.height - 30), 0)
+    this.addChild(this.getGiftBagSprite)
+  }
+
   walk () {
     this.onMoving = true
     this.isWalking = true
@@ -423,9 +442,14 @@ export class Coco extends PIXI.Container {
     })
     this.walkFlowerPatchSprite.visible = this.hasFlower
     this.reactionSprite.visible = this.hasReaction
-    this.walkSprite.gotoAndPlay(0)
-    this.walkFlowerPatchSprite.gotoAndPlay(0)
-    this.walkSprite.visible = true
+    if (this.hasGiftBag) {
+      this.walkGiftSprite.gotoAndPlay(0)
+      this.walkGiftSprite.visible = true
+    } else {
+      this.walkSprite.gotoAndPlay(0)
+      this.walkFlowerPatchSprite.gotoAndPlay(0)
+      this.walkSprite.visible = true
+    }
     this.eyeBlinkSprite.visible = true
     this.reverseWalkPatchSprite.visible = this.orirentation === 'right'
   }
@@ -595,7 +619,7 @@ export class Coco extends PIXI.Container {
           this.downSmileSprite.onComplete = () => {
             resolve()
           }
-        } else if (this.baseSprite.visible || this.walkSprite.visible) {
+        } else if (this.baseSprite.visible || this.walkSprite.visible || this.walkGiftSprite.visible || this.getGiftBagSprite.visible) {
           this.smileSprite.visible = true
           this.smileSprite.rotation = 0
           this.smileSprite.x = 0
@@ -734,6 +758,7 @@ export class Coco extends PIXI.Container {
   setWalkSpeed (_walkSpeed: number = 6) {
     this.walkSpeed = _walkSpeed
     this.walkSprite.animationSpeed = _walkSpeed / 60
+    this.walkGiftSprite.animationSpeed = _walkSpeed / 60
   }
 
   async getFlowerBefore (): Promise<void> {
@@ -759,8 +784,18 @@ export class Coco extends PIXI.Container {
   }
 
   async getGiftBag (): Promise<void> {
-    // TODO torikoからのプレゼントをもらう
-    // TODO 退場時のアニメーション 腕を変形
-    await Common.sleep(2000)
+    this.children.forEach((child) => {
+      child.visible = false
+    })
+    this.reverseWalkPatchSprite.visible = this.orirentation === 'right'
+    this.getGiftBagSprite.visible = true
+    this.getGiftBagSprite.gotoAndPlay(0)
+    this.hasGiftBag = true
+
+    await new Promise<void>((resolve) => {
+      this.getGiftBagSprite.onComplete = () => {
+        resolve()
+      }
+    })
   }
 }

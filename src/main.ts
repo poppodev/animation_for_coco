@@ -4,7 +4,7 @@ import { Coco } from './class/coco'
 import { Komatsu } from './class/komatsu'
 import { Toriko } from './class/toriko'
 import { Sunny } from './class/sunny'
-import { Queen } from './class/queen'
+import { Queen, QueenShadow } from './class/queen'
 import { Zebra } from './class/zebra'
 import './styles/index.css'
 
@@ -46,18 +46,22 @@ async function setUp () {
   const sunny = new Sunny(app, 0.4)
   queen.addChild(sunny)
   const zebra = new Zebra(app, 0.4)
+  const queenShadow = new QueenShadow(queen.width)
   app.stage.addChild(toriko)
   app.stage.addChild(queen)
   app.stage.addChild(komatsu)
   app.stage.addChild(coco)
   app.stage.addChild(zebra)
+  app.stage.addChild(queenShadow)
 
   // coco appear
   coco.walkTo(initialX).then(() => {
     setOnEvent(false)
   })
 
-  const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]
+  // TODO 検証中
+  // const functions = [torikoAppear, komatsuAppear, sunnyAppear, zebraAppear]
+  const functions = [sunnyAppear]
   const calledFunctions = new Set()
   document.getElementById('HBD')!.addEventListener('click', function () {
     if (onEvent) {
@@ -76,8 +80,9 @@ async function setUp () {
   })
 
   // key triggers  TODO keytrigger管理をもうちょっときれいにしたい
+  let shiftDown = false
   document.addEventListener('keydown', async (event) => {
-    const targetKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']
+    const targetKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Shift']
     if (onEvent) {
       return
     }
@@ -85,8 +90,15 @@ async function setUp () {
       coco.stop()
       return
     }
+    if (event.key === 'Shift') {
+      shiftDown = true
+    }
     const isTurn = (event.key === 'ArrowLeft' && coco.orirentation === 'right') ||
       (event.key === 'ArrowRight' && coco.orirentation === 'left')
+
+    const isStartWalking = (!coco.isWalking && !coco.isReachEdge() && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) && !shiftDown
+    const isStartRunning = (!coco.isRunning && !coco.isReachEdge() && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) && shiftDown
+
     if (event.key === 'ArrowDown' && !coco.isDown) {
       setOnEvent(true)
       await coco.down()
@@ -102,8 +114,10 @@ async function setUp () {
     } else if (coco.isReachEdge()) {
       coco.stop()
       setOnEvent(false)
-    } else if (!coco.isWalking && !coco.isReachEdge() && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+    } else if (isStartWalking) {
       coco.walk()
+    } else if (isStartRunning) {
+      coco.run()
     }
   })
 
@@ -115,6 +129,9 @@ async function setUp () {
       coco.stop()
       setOnEvent(false)
     }
+    if (event.key === 'Shift') {
+      shiftDown = false
+    }
   })
 
   // inner functions
@@ -123,15 +140,15 @@ async function setUp () {
     calledFunctions.clear()
   }
 
-  function komatsuAppear () {
-    // TODO cocoの初期値によって開始位置調整が必要
+  async function komatsuAppear () {
     // TODO ラストコールの時にticker系でエラーが出ている？画面左端にいたせいかも？
     setOnEvent(true)
 
-    // ajust orientation
-    if (coco.orirentation === 'right') {
-      coco.stop()
-      coco.turn()
+    if (coco.x < app.renderer.width / 3) {
+      if (coco.orirentation === 'left') {
+        await coco.turn()
+      }
+      await coco.walkTo(app.renderer.width / 3)
     }
 
     // appear from left
@@ -143,8 +160,13 @@ async function setUp () {
       if (komatsu.x > -45) {
         if (!reacted) {
           reacted = true
-          await coco.reaction()
-          await Common.sleep(250)
+          coco.reaction()
+          if (coco.orirentation === 'right') {
+            await coco.turn()
+            await Common.sleep(200)
+          } else {
+            await Common.sleep(500)
+          }
           coco.walk()
         }
       }
@@ -195,11 +217,10 @@ async function setUp () {
   }
 
   async function torikoAppear () {
-    // TODO cocoにgetPresentを追加してから完成
     setOnEvent(true)
 
     // ajust coco start position
-    const startX = app.renderer.width / 2 - coco.width
+    const startX = app.renderer.width / 2
     if (startX < coco.x) {
       await coco.walkTo(startX)
     }
@@ -227,14 +248,11 @@ async function setUp () {
         coco.smile()
         await Common.sleep(1500)
         toriko.removeGift()
+        await coco.getGiftBag()
 
         // toriko away
         toriko.walk()
         await Common.sleep(1000)
-        await coco.turn()
-        await Common.sleep(2000)
-        await coco.turn()
-
         await coco.walkTo(app.renderer.width)
 
         // back to initial position
@@ -256,8 +274,8 @@ async function setUp () {
     const startPointX = initialX - 160
 
     // TODO queen のshadow固定
-
     await Promise.all([comeCoco(), queen.appear()])
+    queenShadow.appear()
 
     coco.faceUp()
     await Common.sleep(1500)

@@ -43,22 +43,10 @@ export class Coco extends PIXI.Container {
     this.manual = manual
 
     // basesprite
-    const standTexture = PIXI.Texture.from('cocoStand')
-    const baseSprite = new PIXI.Sprite(standTexture)
-    baseSprite.name = 'cocoBase'
-
-    // shadow
-    const shadowGraphics = new PIXI.Graphics()
-    shadowGraphics.beginFill(0x000000, 0.15)
-    shadowGraphics.drawEllipse(0, 0, 100, 20)
-    shadowGraphics.endFill()
-    shadowGraphics.x = baseSprite.width / 2
-    shadowGraphics.y = baseSprite.height - 30
-    baseSprite.addChildAt(shadowGraphics, 0)
-    this.addChild(baseSprite)
-    this.baseSprite = baseSprite
-
-    this.faceUpSprite = PIXI.Sprite.from('cocoFaceUp')
+    this.baseSprite = PIXI.Sprite.from('cocoStand')
+    this.baseSprite.name = 'cocoBase'
+    this.baseSprite.addChildAt(this.shadowGraphics(100, this.baseSprite.width / 2, this.baseSprite.height - 30), 0)
+    this.addChild(this.baseSprite)
 
     // initial position
     if (this.manual) {
@@ -143,12 +131,7 @@ export class Coco extends PIXI.Container {
     this.walkSprite.name = 'cocoWalk'
 
     // shadow
-    const shadowGraphics = new PIXI.Graphics()
-    shadowGraphics.beginFill(0x000000, 0.15)
-    shadowGraphics.drawEllipse(0, 0, 170, 20)
-    shadowGraphics.endFill()
-    shadowGraphics.x = this.baseSprite.width / 2 + 20
-    shadowGraphics.y = this.baseSprite.height - 30
+    const shadowGraphics = this.shadowGraphics(170, this.baseSprite.width / 2 + 20, this.baseSprite.height - 30)
     this.walkSprite.addChildAt(shadowGraphics, 0)
 
     this.addChild(this.walkSprite)
@@ -171,12 +154,8 @@ export class Coco extends PIXI.Container {
     this.runSprite.animationSpeed = 0.18
     this.runSprite.play()
     this.runSprite.name = 'cocoRun'
-    const shadowGraphics = new PIXI.Graphics()
-    shadowGraphics.beginFill(0x000000, 0.15)
-    shadowGraphics.drawEllipse(0, 0, 220, 20)
-    shadowGraphics.endFill()
-    shadowGraphics.x = this.baseSprite.width / 2 + 20
-    shadowGraphics.y = this.baseSprite.height - 30
+
+    const shadowGraphics = this.shadowGraphics(220, this.baseSprite.width / 2 + 20, this.baseSprite.height - 30)
     this.runSprite.addChildAt(shadowGraphics, 0)
     this.addChild(this.runSprite)
   }
@@ -196,7 +175,7 @@ export class Coco extends PIXI.Container {
     this.downSprite.name = 'cocoDown'
     this.downSprite.loop = false
     this.downSprite.visible = false
-    this.downSprite.addChildAt(this.downShadowGraphics(), 0)
+    this.downSprite.addChildAt(this.shadowGraphics(200, this.baseSprite.width / 2, this.baseSprite.height - 30), 0)
     this.addChild(this.downSprite)
 
     // cover remove
@@ -206,7 +185,7 @@ export class Coco extends PIXI.Container {
     this.removeCoverSprite.loop = false
     this.removeCoverSprite.visible = false
     this.removeCoverSprite.name = 'removeCover'
-    this.removeCoverSprite.addChildAt(this.downShadowGraphics(), 0)
+    this.removeCoverSprite.addChildAt(this.shadowGraphics(200, this.baseSprite.width / 2, this.baseSprite.height - 30), 0)
     this.addChild(this.removeCoverSprite)
 
     // cover append
@@ -216,7 +195,7 @@ export class Coco extends PIXI.Container {
     this.appendCoverSprite.loop = false
     this.appendCoverSprite.visible = false
     this.appendCoverSprite.name = 'appendCover'
-    this.appendCoverSprite.addChildAt(this.downShadowGraphics(), 0)
+    this.appendCoverSprite.addChildAt(this.shadowGraphics(200, this.baseSprite.width / 2, this.baseSprite.height - 30), 0)
     this.addChild(this.appendCoverSprite)
 
     // stand up
@@ -227,17 +206,17 @@ export class Coco extends PIXI.Container {
     this.standUpSprite.name = 'cocoStandUp'
     this.standUpSprite.loop = false
     this.standUpSprite.visible = false
-    this.standUpSprite.addChildAt(this.downShadowGraphics(), 0)
+    this.standUpSprite.addChildAt(this.shadowGraphics(200, this.baseSprite.width / 2, this.baseSprite.height - 30), 0)
     this.addChild(this.standUpSprite)
   }
 
-  private downShadowGraphics (): PIXI.Graphics {
+  private shadowGraphics (width: number, positionX: number, positionY: number): PIXI.Graphics {
     const shadow = new PIXI.Graphics()
     shadow.beginFill(0x000000, 0.15)
-    shadow.drawEllipse(0, 0, 200, 20)
+    shadow.drawEllipse(0, 0, width, 20)
     shadow.endFill()
-    shadow.x = this.baseSprite.width / 2
-    shadow.y = this.baseSprite.height - 30
+    shadow.x = positionX
+    shadow.y = positionY
     return shadow
   }
 
@@ -257,14 +236,7 @@ export class Coco extends PIXI.Container {
     this.turnLeftSprite.name = 'cocoTurnLeft'
     this.turnLeftSprite.loop = false
     this.turnLeftSprite.visible = false
-
-    const shadowGraphics = new PIXI.Graphics()
-    shadowGraphics.beginFill(0x000000, 0.15)
-    shadowGraphics.drawEllipse(0, 0, 200, 20)
-    shadowGraphics.endFill()
-    shadowGraphics.x = this.baseSprite.width / 2
-    shadowGraphics.y = this.baseSprite.height - 30
-    this.turnLeftSprite.addChildAt(shadowGraphics, 0)
+    this.turnLeftSprite.addChildAt(this.shadowGraphics(200, this.baseSprite.width / 2, this.baseSprite.height - 30), 0)
 
     this.addChild(this.turnLeftSprite)
   }
@@ -369,6 +341,7 @@ export class Coco extends PIXI.Container {
     // face up sprite
     this.faceUpSprite = PIXI.Sprite.from('cocoFaceUp')
     this.faceUpSprite.visible = false
+    this.faceUpSprite.addChildAt(this.shadowGraphics(100, this.baseSprite.width / 2, this.baseSprite.height - 30), 0)
     this.addChild(this.faceUpSprite)
     this.reverseFaceUpSprite = PIXI.Sprite.from('cocoFaceUpReverse')
     this.reverseFaceUpSprite.visible = false
@@ -396,6 +369,7 @@ export class Coco extends PIXI.Container {
   }
 
   walk () {
+    console.log('walk')
     this.onMoving = true
     this.isWalking = true
     this.isRunning = false
@@ -447,6 +421,7 @@ export class Coco extends PIXI.Container {
   }
 
   run () {
+    console.log('run')
     this.onMoving = true
     this.isDown = false
     this.isWalking = false
@@ -470,6 +445,8 @@ export class Coco extends PIXI.Container {
     })
     this.reverseWalkPatchSprite.visible = this.orirentation === 'right'
     this.baseSprite.visible = true
+    console.log(this.baseSprite)
+    console.log(this.baseSprite.children)
     this.reactionSprite.visible = this.hasReaction
   }
 
@@ -684,10 +661,9 @@ export class Coco extends PIXI.Container {
   }
 
   async reaction (): Promise<void> {
-    // TODO ２回目以降出ていないかも
-    console.log('reaction')
     this.hasReaction = true
     this.reactionSprite.visible = true
+    this.reactionSprite.alpha = 1
     const direction = this.orirentation === 'left' ? 1 : -1
     this.reactionSprite.x = direction * this.width + 20
 
@@ -716,7 +692,13 @@ export class Coco extends PIXI.Container {
   }
 
   async getFlower (): Promise<void> {
-    // TODO
+    // TODO getFlower関数
+    await Common.sleep(2000)
+  }
+
+  async getGiftBag (): Promise<void> {
+    // TODO torikoからのプレゼントをもらう
+    // TODO 退場時のアニメーション　腕を変形
     await Common.sleep(2000)
   }
 }

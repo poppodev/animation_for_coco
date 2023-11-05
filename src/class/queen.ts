@@ -129,3 +129,43 @@ export class Queen extends PIXI.Container {
     })
   }
 }
+
+export class QueenShadow extends PIXI.Graphics {
+  constructor (qunnSize: number) {
+    super()
+    console.log(`queenSize:${qunnSize}`)
+    const shadowGraphics = new PIXI.Graphics()
+    shadowGraphics.beginFill(0x000000, 0.15)
+    shadowGraphics.drawEllipse(0, 0, qunnSize, 20)
+    shadowGraphics.endFill()
+  }
+
+  async appear (): Promise<void> {
+    console.log('appear shadow')
+    console.log(`this.alpha:${this.alpha},this.visible:${this.visible}`)
+    const ticker = new PIXI.Ticker()
+    await new Promise<void>((resolve) => {
+      ticker.add(() => {
+        this.alpha += 0.05
+        if (this.alpha >= 1) {
+          ticker.destroy()
+          resolve()
+        }
+      })
+      ticker.start()
+    })
+  }
+
+  async leave (): Promise<void> {
+    console.log('leave shadow')
+    const ticker = new PIXI.Ticker()
+    ticker.add(() => {
+      this.alpha -= 0.05
+      if (this.alpha <= 1) {
+        ticker.destroy()
+        Promise.resolve()
+      }
+    })
+    ticker.start()
+  }
+}

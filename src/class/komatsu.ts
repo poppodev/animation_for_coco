@@ -57,7 +57,7 @@ export class Komatsu extends PIXI.Container {
     this.reset()
 
     // animation loop
-    this.app.ticker.add(() => {
+    this.app.ticker.add((delta) => {
       // auto turn
       if (this.manual) {
         if (this.isWalking) {
@@ -80,7 +80,7 @@ export class Komatsu extends PIXI.Container {
 
       const direction = this.orirentation === 'right' ? 1 : -1
       if (this.isWalking) {
-        this.x += this.walkSpeed * scale * direction
+        this.x += this.walkSpeed * scale * direction * delta
       }
     })
   }
@@ -242,23 +242,22 @@ class Sparkle extends PIXI.Graphics {
 
   async blink (): Promise<void> {
     const effectTicker = new PIXI.Ticker()
-    effectTicker.maxFPS = 60
     await Common.sleep(this.waitingTime)
     new Promise<void>((resolve) => {
       let frame = 0
-      effectTicker.add(() => {
-        this.y += -0.5
-        frame += 1
+      effectTicker.add((delta) => {
+        this.y += -0.5 * delta
+        frame += 1 * delta
         if ((frame > 20 && frame < 40) || (frame > 60 && frame < 80)) {
           this.scale.set(1.5)
         } else {
           this.scale.set(1)
         }
         if (frame > 20) {
-          this.blinkFrames -= 1
+          this.blinkFrames -= 1 * delta
           if (this.blinkFrames <= 0) {
-            this.alpha -= 0.05
-            this.y += -0.5
+            this.alpha -= 0.05 * delta
+            this.y += -0.5 * delta
             if (this.alpha <= 0) {
               effectTicker.destroy()
               resolve()

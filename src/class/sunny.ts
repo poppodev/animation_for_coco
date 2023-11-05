@@ -67,14 +67,13 @@ export class Sunny extends PIXI.Container {
 
     new Promise<void>((resolve) => {
       const ticker = new PIXI.Ticker()
-      ticker.maxFPS = 60
-      ticker.add(() => {
+      ticker.add((delta) => {
         if (on) {
           if (this.armSprite.angle < stopAngle) {
             resolve()
             ticker.destroy()
           } else {
-            this.armSprite.angle -= 2
+            this.armSprite.angle -= 2 * delta
           }
         } else {
           if (this.armSprite.angle > 0) {
@@ -82,7 +81,7 @@ export class Sunny extends PIXI.Container {
             resolve()
             ticker.destroy()
           } else {
-            this.armSprite.angle += 2
+            this.armSprite.angle += 2 * delta
           }
         }
       })
@@ -152,25 +151,24 @@ class Hair extends PIXI.Sprite {
     this.visible = true
 
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     let angle = 0
     let isPlus = false
     const flutterMaxAngle = Common.randomNumber(10, 15)
     const flutterMinAngle = -Common.randomNumber(10, 15)
 
-    ticker.add(() => {
+    ticker.add((delta) => {
       if (this.isDown || this.isUp) {
         const baseAngle = (this.isDown) ? this.maxDegree : this.defaultDegree
         if (isPlus) {
           if (angle > flutterMaxAngle) {
             isPlus = false
           }
-          angle += 0.7
+          angle += 0.7 * delta
         } else {
           if (angle < flutterMinAngle) {
             isPlus = true
           }
-          angle -= 0.7
+          angle -= 0.7 * delta
         }
         this.angle = baseAngle + angle
       } else {
@@ -192,17 +190,16 @@ class Hair extends PIXI.Sprite {
   async flutter (startDegree: number, stopDegree: number, speed: number = 1): Promise<void> {
     await new Promise<void>((resolve) => {
       const ticker = new PIXI.Ticker()
-      ticker.maxFPS = 60
       let degree = startDegree
-      ticker.add(() => {
+      ticker.add((delta) => {
         if (startDegree > stopDegree) {
-          degree -= 1 * speed
+          degree -= 1 * speed * delta
           if (degree < stopDegree) {
             resolve()
             ticker.destroy()
           }
         } else {
-          degree += 1 * speed
+          degree += 1 * speed * delta
           if (degree > stopDegree) {
             resolve()
             ticker.destroy()
@@ -217,19 +214,18 @@ class Hair extends PIXI.Sprite {
   private async _bound (startDegree: number, stopDegree: number): Promise<void> {
     await new Promise<void>((resolve) => {
       const ticker = new PIXI.Ticker()
-      ticker.maxFPS = 60
       let degree = startDegree
       let touched = false
       let frame = 0
-      ticker.add(() => {
+      ticker.add((delta) => {
         if (touched) {
           // back
           if (degree > stopDegree) {
             resolve()
             ticker.destroy()
           } else {
-            frame -= 0.7
-            degree += Math.abs(frame * 0.1)
+            frame -= 0.7 * delta
+            degree += Math.abs(frame * 0.1) * delta
             this.angle = degree
           }
         } else {
@@ -237,8 +233,8 @@ class Hair extends PIXI.Sprite {
           if (degree <= this.defaultDegree) {
             touched = true
           } else {
-            frame += 0.8
-            degree -= frame * 0.11
+            frame += 0.8 * delta
+            degree -= frame * 0.11 * delta
             this.angle = degree
           }
         }

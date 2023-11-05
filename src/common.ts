@@ -190,9 +190,9 @@ export function setUp (app: PIXI.Application) {
   clouds2.x = clouds.width
   app.stage.addChild(clouds)
   app.stage.addChild(clouds2)
-  app.ticker.add(() => {
-    clouds.x -= 0.15
-    clouds2.x -= 0.15
+  app.ticker.add((delta) => {
+    clouds.x -= 0.15 * delta
+    clouds2.x -= 0.15 * delta
     if (clouds.x < -clouds.width) {
       clouds.x = app.renderer.width
     }

@@ -165,7 +165,6 @@ async function setUp () {
     komatsu.walk()
 
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     let reacted = false
     ticker.add(async () => {
       if (komatsu.x > -45) {
@@ -252,7 +251,6 @@ async function setUp () {
     coco.walk()
 
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     ticker.add(async () => {
       if (toriko.x - coco.width / 2 < coco.x) {
         ticker.stop()
@@ -363,7 +361,6 @@ async function setUp () {
     coco.walk()
 
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     ticker.add(async () => {
       if (zebra.x - coco.width / 4 < coco.x) {
         ticker.stop()

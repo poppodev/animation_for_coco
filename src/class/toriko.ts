@@ -56,7 +56,7 @@ export class Toriko extends PIXI.Container {
     this.reset()
 
     // animation loop
-    this.app.ticker.add(() => {
+    this.app.ticker.add((delta) => {
       if (this.x + this.width < 0) {
         if (this.manual) {
           this.x = app.renderer.width
@@ -64,7 +64,7 @@ export class Toriko extends PIXI.Container {
           this.stop()
         }
       } else if (this.isWalking) {
-        this.x -= 6 * scale
+        this.x -= 6 * scale * delta
       }
     })
   }

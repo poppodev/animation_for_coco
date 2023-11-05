@@ -83,7 +83,7 @@ export class Coco extends PIXI.Container {
     this.setReactionSprite()
 
     // animation loop
-    this.app.ticker.add(() => {
+    this.app.ticker.add((delta) => {
       // turn
       if (this.manual) {
         const originallyRunning = this.isRunning
@@ -102,9 +102,9 @@ export class Coco extends PIXI.Container {
       // walk or run
       const direction = this.orirentation === 'left' ? 1 : -1
       if (this.isWalking) {
-        this.x += -this.walkSpeed * scale * direction
+        this.x += -this.walkSpeed * scale * direction * delta
       } else if (this.isRunning) {
-        this.x += -15 * scale * direction
+        this.x += -15 * scale * direction * delta
       }
 
       // blink
@@ -480,7 +480,6 @@ export class Coco extends PIXI.Container {
       this.run()
     }
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     await new Promise<void>((resolve) => {
       ticker.add(() => {
         if ((this.orirentation === 'left' && this.x < stopPointX) ||
@@ -742,14 +741,13 @@ export class Coco extends PIXI.Container {
     this.reactionSprite.y = -150
 
     const messageTicker = new PIXI.Ticker()
-    messageTicker.maxFPS = 60
     let waitCount = 40
     await new Promise<void>((resolve) => {
-      messageTicker.add(() => {
-        waitCount -= 1
+      messageTicker.add((delta) => {
+        waitCount -= 1 * delta
         if (this.reactionSprite.alpha > 0 && waitCount <= 0) {
-          this.reactionSprite.alpha -= 0.05
-          this.reactionSprite.y -= 2
+          this.reactionSprite.alpha -= 0.05 * delta
+          this.reactionSprite.y -= 2 * delta
         }
         if (this.reactionSprite.alpha <= 0) {
           messageTicker.destroy()

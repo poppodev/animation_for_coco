@@ -45,7 +45,7 @@ export class Zebra extends PIXI.Container {
     this.reset()
 
     // animation loop
-    this.app.ticker.add(() => {
+    this.app.ticker.add((delta) => {
       if (this.x + this.width < 0) {
         if (this.manual) {
           this.x = app.renderer.width
@@ -53,7 +53,7 @@ export class Zebra extends PIXI.Container {
           this.stop()
         }
       } else if (this.isWalking) {
-        this.x -= 6 * scale
+        this.x -= 6 * scale * delta
       }
     })
   }
@@ -171,7 +171,6 @@ export class Zebra extends PIXI.Container {
 
   private async bangEffect () {
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     const panDeleteWaitFrame = 30
     let frame = 0
     await new Promise<void>((resolve) => {
@@ -180,10 +179,10 @@ export class Zebra extends PIXI.Container {
       panSprite.y = 150
       panSprite.x = -50
       this.addChild(panSprite)
-      ticker.add(() => {
-        frame += 1
+      ticker.add((delta) => {
+        frame += 1 * delta
         if (frame >= panDeleteWaitFrame) {
-          panSprite.alpha -= 0.08
+          panSprite.alpha -= 0.08 * delta
           if (panSprite.alpha <= 0) {
             resolve()
             ticker.destroy()
@@ -214,7 +213,6 @@ export class Zebra extends PIXI.Container {
   async walkTo (stopPointX: number): Promise<void> {
     this.walk()
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     await new Promise<void>((resolve) => {
       ticker.add(() => {
         if (this.x < stopPointX) {
@@ -266,12 +264,11 @@ class PaperPiece extends PIXI.Graphics {
 
   async reachTop (): Promise<void> {
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     await new Promise<void>((resolve) => {
-      ticker.add(() => {
-        this.x += (this.reachPointX - this.x) / 10
-        this.y += (this.reachPointY - this.y) / 10
-        this.angle += 5
+      ticker.add((delta) => {
+        this.x += (this.reachPointX - this.x) / 10 * delta
+        this.y += (this.reachPointY - this.y) / 10 * delta
+        this.angle += 5 * delta
         if (Math.round(this.x) <= this.reachPointX) {
           this.x = Math.ceil(this.x)
           ticker.destroy()
@@ -284,22 +281,21 @@ class PaperPiece extends PIXI.Graphics {
 
   async fall (): Promise<void> {
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     const scaleMultiplier = Common.randomNumber(100, 200) / 100
     const anglePlus = Common.randomNumber(200, 500) / 100
     const isScaleChange = Common.randomTrueOrFalse(50)
 
     await new Promise<void>((resolve) => {
       let frame = 0
-      ticker.add(() => {
-        frame += 1
+      ticker.add((delta) => {
+        frame += 1 * delta
         if (this.y >= this.fallPointY) {
           this.x = Math.round(this.x)
           resolve()
         } else {
-          this.x += (this.fallPointX - this.reachPointX) / 100
-          this.y += 6
-          this.angle += anglePlus
+          this.x += delta * (this.fallPointX - this.reachPointX) / 100
+          this.y += 6 * delta
+          this.angle += anglePlus * delta
         }
 
         if (isScaleChange) {
@@ -307,7 +303,7 @@ class PaperPiece extends PIXI.Graphics {
         }
 
         if (this.y >= this.fallPointY - 100) {
-          this.alpha -= 0.02
+          this.alpha -= 0.02 * delta
         }
         if (this.alpha <= 0) {
           ticker.destroy()

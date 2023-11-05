@@ -82,15 +82,13 @@ export class Queen extends PIXI.Container {
     const yStep = (stopY - fromY) / duration
 
     const appearTicker = new PIXI.Ticker()
-    appearTicker.maxFPS = 60
     await new Promise<void>((resolve) => {
-      appearTicker.add(async () => {
+      appearTicker.add(async (delta) => {
         if (this.x < stopX) {
-          this.x += xStep
-          this.y += yStep
+          this.x += xStep * delta
+          this.y += yStep * delta
           this.shadow.y = -this.y + this.shadowDiff
         } else {
-          //
           this.shadow.y = -this.y + this.shadowDiff
           resolve()
           appearTicker.destroy()
@@ -102,13 +100,12 @@ export class Queen extends PIXI.Container {
 
   private async moveVertical (distance: number, step: number): Promise<void> {
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     let moved = 0
     await new Promise<void>((resolve) => {
-      ticker.add(() => {
-        this.y += step
+      ticker.add((delta) => {
+        this.y += step * delta
         this.shadow.y = -this.y + this.shadowDiff
-        moved += step
+        moved += step * delta
         if (Math.abs(moved) >= distance) {
           resolve()
           ticker.destroy()
@@ -133,12 +130,11 @@ export class Queen extends PIXI.Container {
     const xStep = (stopPointX - startPointX) / duration
     const yStep = (stopPointY - startPointY) / duration
     const appearTicker = new PIXI.Ticker()
-    appearTicker.maxFPS = 60
     await new Promise<void>((resolve) => {
-      appearTicker.add(() => {
+      appearTicker.add((delta) => {
         if (this.x < stopPointX) {
-          this.x += xStep
-          this.y += yStep
+          this.x += xStep * delta
+          this.y += yStep * delta
           this.shadow.y = -this.y + this.shadowDiff
         } else {
           this.reset()
@@ -164,10 +160,9 @@ class QueenShadow extends PIXI.Graphics {
 
   async appear (): Promise<void> {
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     await new Promise<void>((resolve) => {
-      ticker.add(() => {
-        this.alpha += 0.01
+      ticker.add((delta) => {
+        this.alpha += 0.01 * delta
         if (this.alpha >= 1) {
           ticker.destroy()
           resolve()
@@ -179,10 +174,9 @@ class QueenShadow extends PIXI.Graphics {
 
   async leave (): Promise<void> {
     const ticker = new PIXI.Ticker()
-    ticker.maxFPS = 60
     await new Promise<void>((resolve) => {
-      ticker.add(() => {
-        this.alpha -= 0.01
+      ticker.add((delta) => {
+        this.alpha -= 0.01 * delta
         if (this.alpha <= 0) {
           ticker.destroy()
           resolve()
